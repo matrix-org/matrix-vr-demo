@@ -63,7 +63,7 @@ export default class TourismScene extends React.Component {
             video.player.getDebug().setLogToBrowserConsole(false);
             video.player.initialize(video, video.src, false);
             video.player.setFastSwitchEnabled(true);
-            video.player.setInitialBitrateFor('video', 2500);
+            video.player.setInitialRepresentationRatioFor('video', 1);
             this.videos.push(video);
         });
         this.transformUvs(0);
