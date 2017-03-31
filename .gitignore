@@ -1,0 +1,8 @@
+node_modules/
+npm-debug.log
+*.sw[ponm]
+gh-pages
+.DS_Store
+build/*
+src/config.json
+src/video/

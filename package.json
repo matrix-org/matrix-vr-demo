@@ -1,0 +1,48 @@
+{
+  "name": "mxvr-tourism-demo",
+  "version": "0.0.1",
+  "description": "Matrix VR tourism demo",
+  "dependencies": {
+    "aframe": "matrix-org/aframe#master",
+    "aframe-auto-detect-controllers-component": "^0.1.4",
+    "aframe-controller-cursor-component": "^0.2.1",
+    "aframe-look-at-component": "matrix-org/aframe-look-at-component#master",
+    "aframe-mouse-cursor-component": "^0.4.1",
+    "aframe-react": "^3.5.0",
+    "aframe-teleport-controls": "^0.2.0",
+    "babel-polyfill": "^6.23.0",
+    "headtrackr": "0.0.1",
+    "lodash": "^4.17.4",
+    "matrix-js-sdk": "matrix-org/matrix-js-sdk#2e731975ac500dd0d636cbd1980fc55074b582e1",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-loader": "^2.4.0",
+    "sillyid": "^0.2.0"
+  },
+  "scripts": {
+    "build": "(cd node_modules/matrix-js-sdk && npm i && npm run build) && webpack",
+    "serve": "webpack-dev-server --content-base src --progress --watch --history-api-fallback --inline --hot --host 0.0.0.0 --port 9090 --https"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matrix-org/mxvr-tourism-demo.git"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.3.15",
+    "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.2.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "babel-runtime": "^6.23.0",
+    "css-loader": "^0.26.2",
+    "eslint": "^3.17.1",
+    "eslint-config-google": "^0.7.1",
+    "eslint-plugin-react": "^6.10.0",
+    "json-loader": "^0.5.4",
+    "style-loader": "^0.13.2",
+    "webpack": "^1.12.9",
+    "webpack-dev-server": "^1.14.0"
+  }
+}
