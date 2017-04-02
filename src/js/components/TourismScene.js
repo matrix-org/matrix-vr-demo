@@ -27,6 +27,13 @@ function degreesToRadians(degrees) {
 
 const REFLECTION_PROPORTION = 1.0;
 
+const VIDEOS = [
+    'https://matrix.org/vrdemo_resources/video/360/ski1.mpd',
+    'https://matrix.org/vrdemo_resources/video/360/ski2.mpd',
+    'https://matrix.org/vrdemo_resources/video/360/ski3.mpd',
+    'https://matrix.org/vrdemo_resources/video/360/ski4.mpd',
+];
+
 export default class TourismScene extends React.Component {
     constructor(props) {
         super(props);
@@ -45,6 +52,21 @@ export default class TourismScene extends React.Component {
         this.clickHandler = this.clickHandler.bind(this);
         this.playNextVideo = this.playNextVideo.bind(this);
         this._onKeyEvent = this._onKeyEvent.bind(this);
+
+        // Set up videos
+        this.videos = [];
+        document.querySelectorAll('span#tourism video').forEach((video, index) => {
+            if (!video.player) {
+                video.player = dashPlayer().create();
+                video.player.getDebug().setLogToBrowserConsole(false);
+                video.player.initialize(video, VIDEOS[index], false);
+                video.player.setFastSwitchEnabled(true);
+                video.player.setInitialRepresentationRatioFor('video', 1);
+                video.player.on('error', console.error);
+            }
+            video.player.seek(0);
+            this.videos.push(video);
+        });
     }
 
     onLoaded() {
@@ -56,29 +78,24 @@ export default class TourismScene extends React.Component {
         this.music.currentTime = 0;
         if (this.music) this.music.play();
 
-        // Set up videos
-        this.videos = [];
-        document.querySelectorAll('span#tourism video').forEach((video) => {
-            video.player = dashPlayer().create();
-            video.player.getDebug().setLogToBrowserConsole(false);
-            video.player.initialize(video, video.src, false);
-            video.player.setFastSwitchEnabled(true);
-            video.player.setInitialRepresentationRatioFor('video', 1);
-            this.videos.push(video);
+        // just in case
+        this.videos.forEach((video) => {
+            video.player.seek(0);
         });
         this.transformUvs(0);
 
         // Play the video and set up event listeners
-        this.videos[this.state.videoIndex].player.play();
         this.videos[this.state.videoIndex].player.on('playbackEnded', this.playNextVideo);
+        this.videos[this.state.videoIndex].player.play();
         dispatcher.on('keyEvent', this._onKeyEvent);
+        dispatcher.addListener('controllerTrigger', this.triggerDown);
+        window.addEventListener('dblclick', this.clickHandler);
     }
 
     _onKeyEvent(key) {
         switch (key) {
             case 'n':
                 console.log('Skipping video');
-                this.videos[this.state.videoIndex].player.pause();
                 this.playNextVideo();
                 break;
             case 'm':
@@ -109,22 +126,17 @@ export default class TourismScene extends React.Component {
         }
     }
 
-    videoEnded() {
-        console.log('Video ended');
-        // In case video is set to loop
+    playNextVideo() {
         if (this.videos[this.state.videoIndex]) {
             this.videos[this.state.videoIndex].player.pause();
+            this.videos[this.state.videoIndex].player.off('playbackEnded',
+                this.playNextVideo);
         }
-        this.playNextVideo();
-    }
-
-    playNextVideo() {
-        this.videos[this.state.videoIndex].player.off('playbackEnded', this.playNextVideo);
         const newIndex = this.state.videoIndex + 1;
         this.setState({videoIndex: newIndex});
 
         if (newIndex < this.videos.length) {
-            console.log('Playing next video in queue');
+            console.log('Playing next video in queue', newIndex);
             this.videos[newIndex].player.on('playbackEnded', this.playNextVideo);
             this.transformUvs(newIndex);
             this.videos[newIndex].player.seek(0); // Seek to begining of video
@@ -178,9 +190,6 @@ export default class TourismScene extends React.Component {
 
     componentDidMount() {
         console.warn("Tourism scene component mounted");
-        dispatcher.addListener('controllerTrigger', this.triggerDown);
-
-        window.addEventListener('dblclick', this.clickHandler);
     }
 
     componentWillUnmount() {
