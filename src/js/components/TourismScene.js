@@ -201,7 +201,7 @@ export default class TourismScene extends React.Component {
         }
         dispatcher.removeListener('keyEvent', this._onKeyEvent);
         dispatcher.removeListener('controllerTrigger', this.triggerDown);
-        window.removeEventListener('click', this.clickHandler);
+        window.removeEventListener('dblclick', this.clickHandler);
     }
 
     render() {
