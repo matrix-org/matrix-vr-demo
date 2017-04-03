@@ -18,10 +18,12 @@ limitations under the License.
 import React from 'react';
 import {default as SillyId} from 'sillyid';
 
+import {getParameterByName} from '../structures/utils';
+
 const localStorage = window.localStorage;
 
 const USERNAME_REGEX = /@(.+):(.+)/;
-const ROOM_ALIAS_REGEX = /#\/room\/(#.+:.+)/;
+const ROOM_ALIAS_REGEX = /#\/room\/(#[^:]+:[^?]+)/;
 const CONF_HOME_SERVER = 'https://conf.matrix.org:8448';
 
 function postAlert(message) {
@@ -53,8 +55,12 @@ function getRoomAlias(roomAlias, homeserver) {
     return '';
 }
 
-function makeHash(roomAlias) {
-    return `/room/${getRoomAlias(roomAlias, CONF_HOME_SERVER)}`;
+function makeHash(roomAlias, peerId) {
+    let queryParams = '';
+    if (peerId && peerId.length > 0) {
+        queryParams = `?guestId=${peerId}`;
+    }
+    return `/room/${getRoomAlias(roomAlias, CONF_HOME_SERVER)}${queryParams}`;
 }
 
 export default class Login extends React.Component {
@@ -64,6 +70,7 @@ export default class Login extends React.Component {
         this.onUsernameChanged = this.onUsernameChanged.bind(this);
         this.onPasswordChanged = this.onPasswordChanged.bind(this);
         this.onHomeserverChanged = this.onHomeserverChanged.bind(this);
+        this.onPeerIdBlur = this.onPeerIdBlur.bind(this);
         this.onPeerIdChanged = this.onPeerIdChanged.bind(this);
         this.onRoomAliasBlur = this.onRoomAliasBlur.bind(this);
         this.onRoomAliasChanged = this.onRoomAliasChanged.bind(this);
@@ -86,7 +93,7 @@ export default class Login extends React.Component {
             password: '',
             accessToken: null,
             homeserver: CONF_HOME_SERVER,
-            peerId: '',
+            peerId: getParameterByName('guideId') || '',
             roomAlias: null,
             loginType: 'guest',
         };
@@ -117,17 +124,23 @@ export default class Login extends React.Component {
             state.roomAlias = this.generateRoomAlias();
         }
 
-        window.location.hash = makeHash(state.roomAlias);
+        window.location.hash = makeHash(state.roomAlias, state.peerId);
 
         this.state = state;
     }
 
     _onHashChange() {
+        const newState = {};
         const roomAlias = window.location.hash.match(ROOM_ALIAS_REGEX);
         if (roomAlias) {
-            this.setState({
-                roomAlias: roomAlias[1],
-            });
+            newState.roomAlias = roomAlias[1];
+        }
+        const guideId = getParameterByName('guideId');
+        if (guideId) {
+            newState.peerId = guideId;
+        }
+        if (Object.keys(newState).length > 0) {
+            this.setState(newState);
         }
     }
 
@@ -148,7 +161,7 @@ export default class Login extends React.Component {
     }
 
     onGenerateRoomNameClicked() {
-        window.location.hash = makeHash(this.generateRoomAlias());
+        window.location.hash = makeHash(this.generateRoomAlias(), this.state.peerId);
     }
 
     onClearLocalStorageClicked() {
@@ -269,12 +282,16 @@ export default class Login extends React.Component {
         this.setState({homeserver: event.target.value});
     }
 
+    onPeerIdBlur() {
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
+    }
+
     onPeerIdChanged(event) {
         this.setState({peerId: event.target.value});
     }
 
     onRoomAliasBlur() {
-        window.location.hash = makeHash(this.state.roomAlias);
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
     }
 
     onRoomAliasChanged(event) {
@@ -287,7 +304,7 @@ export default class Login extends React.Component {
             loginType: 'guest',
             homeserver: CONF_HOME_SERVER,
         });
-        window.location.hash = makeHash(this.state.roomAlias);
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
     }
 
     onMatrixLoginClicked() {
@@ -295,13 +312,14 @@ export default class Login extends React.Component {
             loginType: 'userId',
             homeserver: this.matrixHomeserver || 'https://matrix.org',
         });
-        window.location.hash = makeHash(this.state.roomAlias);
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
         this.matrixHomeserver = null;
     }
 
     render() {
         const roomAlias = getRoomAlias(this.state.roomAlias, this.state.homeserver);
-        const link = `${window.location.origin}${window.location.pathname}#/room/${roomAlias}`;
+        const link = `${window.location.origin}${window.location.pathname}#` +
+            makeHash(roomAlias, this.state.peerId);
 
         return (
             <div className="login">
@@ -408,6 +426,7 @@ export default class Login extends React.Component {
                         name="peerId"
                         placeholder="@user:domain.com"
                         value={this.state.peerId}
+                        onBlur={this.onPeerIdBlur}
                         onChange={this.onPeerIdChanged} />
 
                     <br/>
@@ -548,6 +567,7 @@ export default class Login extends React.Component {
 }
 
 Login.propTypes = {
+    guideId: React.PropTypes.string,
     onSubmit: React.PropTypes.func.isRequired, // fn({username, password, homeserver, peerId, roomAlias, accessToken})
     roomAlias: React.PropTypes.string,
 };
