@@ -17,11 +17,14 @@ limitations under the License.
 
 import React from 'react';
 import {default as SillyId} from 'sillyid';
+import {default as webglDetect} from 'webgl-detect';
+
+import {getParameterByName} from '../structures/utils';
 
 const localStorage = window.localStorage;
 
 const USERNAME_REGEX = /@(.+):(.+)/;
-const ROOM_ALIAS_REGEX = /#\/room\/(#.+:.+)/;
+const ROOM_ALIAS_REGEX = /#\/room\/(#[^:]+:[^?]+)/;
 const CONF_HOME_SERVER = 'https://conf.matrix.org:8448';
 
 function postAlert(message) {
@@ -53,8 +56,12 @@ function getRoomAlias(roomAlias, homeserver) {
     return '';
 }
 
-function makeHash(roomAlias) {
-    return `/room/${getRoomAlias(roomAlias, CONF_HOME_SERVER)}`;
+function makeHash(roomAlias, peerId) {
+    let queryParams = '';
+    if (peerId && peerId.length > 0) {
+        queryParams = `?guestId=${peerId}`;
+    }
+    return `/room/${getRoomAlias(roomAlias, CONF_HOME_SERVER)}${queryParams}`;
 }
 
 export default class Login extends React.Component {
@@ -64,6 +71,7 @@ export default class Login extends React.Component {
         this.onUsernameChanged = this.onUsernameChanged.bind(this);
         this.onPasswordChanged = this.onPasswordChanged.bind(this);
         this.onHomeserverChanged = this.onHomeserverChanged.bind(this);
+        this.onPeerIdBlur = this.onPeerIdBlur.bind(this);
         this.onPeerIdChanged = this.onPeerIdChanged.bind(this);
         this.onRoomAliasBlur = this.onRoomAliasBlur.bind(this);
         this.onRoomAliasChanged = this.onRoomAliasChanged.bind(this);
@@ -71,6 +79,7 @@ export default class Login extends React.Component {
         this.onMatrixLoginClicked = this.onMatrixLoginClicked.bind(this);
         this.onGenerateRoomNameClicked = this.onGenerateRoomNameClicked.bind(this);
         this.onClearLocalStorageClicked = this.onClearLocalStorageClicked.bind(this);
+        this.canPlayH264 = this.canPlayH264.bind(this);
 
         this.generateRoomAlias = this.generateRoomAlias.bind(this);
 
@@ -86,7 +95,7 @@ export default class Login extends React.Component {
             password: '',
             accessToken: null,
             homeserver: CONF_HOME_SERVER,
-            peerId: '',
+            peerId: getParameterByName('guideId') || '',
             roomAlias: null,
             loginType: 'guest',
         };
@@ -117,17 +126,23 @@ export default class Login extends React.Component {
             state.roomAlias = this.generateRoomAlias();
         }
 
-        window.location.hash = makeHash(state.roomAlias);
+        window.location.hash = makeHash(state.roomAlias, state.peerId);
 
         this.state = state;
     }
 
     _onHashChange() {
+        const newState = {};
         const roomAlias = window.location.hash.match(ROOM_ALIAS_REGEX);
         if (roomAlias) {
-            this.setState({
-                roomAlias: roomAlias[1],
-            });
+            newState.roomAlias = roomAlias[1];
+        }
+        const guideId = getParameterByName('guideId');
+        if (guideId) {
+            newState.peerId = guideId;
+        }
+        if (Object.keys(newState).length > 0) {
+            this.setState(newState);
         }
     }
 
@@ -143,12 +158,12 @@ export default class Login extends React.Component {
         let alias;
         do {
             alias = this.sid.generate();
-        } while(alias.length > 20);
+        } while (alias.length > 20);
         return alias;
     }
 
     onGenerateRoomNameClicked() {
-        window.location.hash = makeHash(this.generateRoomAlias());
+        window.location.hash = makeHash(this.generateRoomAlias(), this.state.peerId);
     }
 
     onClearLocalStorageClicked() {
@@ -269,12 +284,16 @@ export default class Login extends React.Component {
         this.setState({homeserver: event.target.value});
     }
 
+    onPeerIdBlur() {
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
+    }
+
     onPeerIdChanged(event) {
         this.setState({peerId: event.target.value});
     }
 
     onRoomAliasBlur() {
-        window.location.hash = makeHash(this.state.roomAlias);
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
     }
 
     onRoomAliasChanged(event) {
@@ -287,7 +306,7 @@ export default class Login extends React.Component {
             loginType: 'guest',
             homeserver: CONF_HOME_SERVER,
         });
-        window.location.hash = makeHash(this.state.roomAlias);
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
     }
 
     onMatrixLoginClicked() {
@@ -295,107 +314,49 @@ export default class Login extends React.Component {
             loginType: 'userId',
             homeserver: this.matrixHomeserver || 'https://matrix.org',
         });
-        window.location.hash = makeHash(this.state.roomAlias);
+        window.location.hash = makeHash(this.state.roomAlias, this.state.peerId);
         this.matrixHomeserver = null;
+    }
+
+    canPlayH264() {
+        const v = document.createElement('video');
+        return !!(v.canPlayType && v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
     }
 
     render() {
         const roomAlias = getRoomAlias(this.state.roomAlias, this.state.homeserver);
-        const link = `${window.location.origin}${window.location.pathname}#/room/${roomAlias}`;
+        const link = `${window.location.origin}${window.location.pathname}#` +
+            makeHash(roomAlias, this.state.peerId);
 
-        return (
-            <div className="login">
-                <a href="https://matrix.org">
-                    <img className="login_logo" src="images/matrix.svg" width="200"/>
-                </a>
-                <h1>Matrix + WebVR + WebRTC</h1>
+        const noWebVrWarning = <div className="panel infoPanel">
+            Your browser does not support WebVR.
+            You can still use the demo in non-VR mode. However, please see <a href="https://webvr.rocks/">WebVR.rocks</a> for details of how to obtain a browser with support for VR devices.
+        </div>;
 
-                <div className="description">
-                    <div>
-                        This demo showcases <a href="https://matrix.org">Matrix</a> as an open decentralised comms layer for the open VR web, illustrating:
-                        <ul>
-                            <li>1:1 calls between WebVR apps and arbitrary Matrix users, in a "VR tour guide" scenario.</li>
-                            <li>Video conferencing within WebVR using WebRTC calls signalled over Matrix</li>
-                        </ul>
-                        The point of the demo is to show what happens when you plug <a href="https://github.com/matrix-org/matrix-js-sdk">matrix-js-sdk</a>
-                        , <a href="https://webvr.rocks">WebVR</a> and <a href="https://aframe.io">A-Frame</a> together, and take one step closer to an
-                        open standards based VR metaverse :D  For more details, see <a href="https://matrix.org/blog">the blog post</a>.
-                        Source code available (Apache License) on <a href="https://github.com/matrix-org/mxvr-demo">Github</a>.
-                    </div>
-                    <p>
-                        The demo should work on any browser capable of WebVR & WebRTC - i.e. Chrome or Firefox on
-                        Desktop or Android.  Browsers on iOS sadly still have no WebRTC, and nor does Safari on macOS.
-                        It runs on plain phones & desktop/laptops, as well as <a href="https://vr.google.com/cardboard">Google Cardboard</a> devices,
-                        all the way up to the <a href="https://vive.com">HTC Vive</a> and <a href="https://oculus.com">Oculus Rift</a>.
-                        If you have a Vive or Rift you'll need to <a href="https://webvr.rocks">enable full WebVR support in your browser</a>.
-                    </p>
-                </div>
+        const noWebGlWarning = <div className="panel errorPanel">
+            This demo requires WebGL. Please make sure that it supported by your browser and that it is enabled in your settings!
+        </div>;
 
-                <div className="screenies">
-                    <img src="images/s1.jpg" width="240" height="150"/> <img src="images/s2.jpg" width="240" height="150"/> <img src="images/s3.jpg" width="240" height="150"/>
-                </div>
+        const noWebRtcWarning = <div className="panel warningPanel">
+            Your browser does not support WebRTC. You can proceed anyway, but none of the video calling will work, and the demo will be almost useless! Please try using latest Chrome or Firefox.
+        </div>;
 
-                <h2>Configure the demo</h2>
+        const noH264Warning = <div className="panel warningPanel">
+            Your browser does not support the H.264 video codec. You can proceed anyway, but some videos in the lobby and tourism scenes will not work. Please try using latest Chrome or Firefox.
+        </div>;
 
-                <label>
-                    <input
-                        type="radio"
-                        name="login_type"
-                        defaultChecked={ this.state.loginType === 'guest' }
-                        onChange={ (e)=>{ this.onGuestLoginClicked(e); } }
-                    />
-                    Use as guest
-                </label>
+        const loginForm = <div>
+            {/* Provide an info. panel warning if browser does not support WebVR */}
+            {!window.hasNativeWebVRImplementation && noWebVrWarning}
+            {/* Warn if browser does not support WebRTC */}
+            {!window.navigator.getUserMedia && !window.navigator.webkitGetUserMedia &&
+                    !window.navigator.mozGetUserMedia && noWebRtcWarning}
+            {/* Warn if browser does not support H.264, required for static videos */}
+            {!this.canPlayH264() && noH264Warning}
 
-                <label>
-                    <input
-                        type="radio"
-                        name="login_type"
-                        defaultChecked={ this.state.loginType === 'userId' }
-                        onChange={ (e)=>{ this.onMatrixLoginClicked(e); } }
-                    />
-                    Log in as existing Matrix User
-                </label>
+            <h2>Configure the demo</h2>
 
                 <form onSubmit={this.onSubmitForm}>
-                    <div style={this.state.loginType === 'guest' ? {display: 'none'} : null}>
-                        <h3>Matrix Login details:</h3>
-                        <label>
-                            user name:
-                            <input
-                                type="text"
-                                name="username"
-                                size="48"
-                                placeholder="User name"
-                                autoFocus
-                                value={this.state.username}
-                                onChange={this.onUsernameChanged} />
-                        </label>
-
-                        <label>
-                            password:
-                            <input
-                                type="password"
-                                name="password"
-                                size="48"
-                                value={this.state.password}
-                                onChange={this.onPasswordChanged} />
-                        </label>
-
-                        <label>
-                            homeserver URL:
-                            <input
-                                type="text"
-                                name="homeserver"
-                                size="48"
-                                placeholder="Home server URL"
-                                value={this.state.homeserver}
-                                onChange={this.onHomeserverChanged} />
-                        </label>
-
-                        <br/>
-                        You can register for an account using a <a href="https://matrix.org/docs/projects/try-matrix-now.html">Matrix client</a> such as <a href="https://riot.im/app">Riot</a>.
-                    </div>
 
                     <p>
                         To try out 1:1 calls in VR and have a guide-like call going throughout the demo enter the Matrix ID of someone
@@ -408,6 +369,7 @@ export default class Login extends React.Component {
                         name="peerId"
                         placeholder="@user:domain.com"
                         value={this.state.peerId}
+                        onBlur={this.onPeerIdBlur}
                         onChange={this.onPeerIdChanged} />
 
                     <br/>
@@ -445,6 +407,41 @@ export default class Login extends React.Component {
                         <input type="submit" value="Go VR!!" />
                     </div>
                 </form>
+            </div>;
+
+        return (
+            <div className="login">
+                <a href="https://matrix.org">
+                    <img className="login_logo" src="images/matrix.svg" width="200"/>
+                </a>
+                <h1>Matrix + WebVR + WebRTC</h1>
+
+                <div className="description">
+                    <div>
+                        This demo showcases <a href="https://matrix.org">Matrix</a> as an open decentralised comms layer for the open VR web, illustrating:
+                        <ul>
+                            <li>1:1 calls between WebVR apps and arbitrary Matrix users, in a "VR tour guide" scenario.</li>
+                            <li>Video conferencing within WebVR using WebRTC calls signalled over Matrix</li>
+                        </ul>
+                        The point of the demo is to show what happens when you plug <a href="https://github.com/matrix-org/matrix-js-sdk">matrix-js-sdk</a>
+                        , <a href="https://webvr.rocks">WebVR</a> and <a href="https://aframe.io">A-Frame</a> together, and take one step closer to an
+                        open standards based VR metaverse :D  For more details, see <a href="https://matrix.org/blog">the blog post</a>.
+                        Source code available (Apache License) on <a href="https://github.com/matrix-org/matrix-vr-demo">Github</a>.
+                    </div>
+                    <p>
+                        The demo should work on any browser capable of WebVR & WebRTC - i.e. Chrome or Firefox on
+                        Desktop or Android.  Browsers on iOS sadly still have no WebRTC, and nor does Safari on macOS.
+                        It runs on plain phones & desktop/laptops, as well as <a href="https://vr.google.com/cardboard">Google Cardboard</a> devices,
+                        all the way up to the <a href="https://vive.com">HTC Vive</a> and <a href="https://oculus.com">Oculus Rift</a>.
+                        If you have a Vive or Rift you'll need to <a href="https://webvr.rocks">enable full WebVR support in your browser</a>.
+                    </p>
+                </div>
+
+                <div className="screenies">
+                    <img src="images/s1.jpg" width="240" height="150"/> <img src="images/s2.jpg" width="240" height="150"/> <img src="images/s3.jpg" width="240" height="150"/>
+                </div>
+
+                {webglDetect ? loginForm : noWebGlWarning}
 
                 <div>
                     If you don’t have a way to run the demo, you can checkout the demo tour video below.
@@ -548,6 +545,7 @@ export default class Login extends React.Component {
 }
 
 Login.propTypes = {
+    guideId: React.PropTypes.string,
     onSubmit: React.PropTypes.func.isRequired, // fn({username, password, homeserver, peerId, roomAlias, accessToken})
     roomAlias: React.PropTypes.string,
 };

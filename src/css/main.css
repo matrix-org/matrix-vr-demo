@@ -22,7 +22,7 @@ body {
     background-image: url('../images/aurora.jpg');
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-position: center; 
+    background-position: center;
     margin: 0px;
 }
 
@@ -129,4 +129,37 @@ a:visited {
 .copyright {
     font-size: 12px;
     color: #888;
+}
+
+.panel {
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 5px;
+    line-height: 1.5em;
+}
+
+.infoPanel {
+    background-color: #9dc1e0;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+.infoPanel a {
+    color: #ffffff;
+}
+
+.warningPanel {
+    background-color: #fcf8e3;
+    color: #f0ad4e;
+    border: 1px solid #f0ad4e;
+}
+
+.warningPanel a {
+    color: #f0ad4e;
+}
+
+.errorPanel {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #a94442;
 }
