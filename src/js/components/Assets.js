@@ -121,7 +121,7 @@ export default class Assets extends React.Component {
                 {/* Ringback video playlist */}
                 <span id='ringback'>
                     <video id='ringback-welcome'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Welcome%20to%20the%20Matrix.mp4'
+                        src='https://matrix.org/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4'
                         preload='auto' crossOrigin></video>
                     <video id='ringback-connecting'
                         src='https://matrix.org/vrdemo_resources/video/ringback/Connecting%20to%20agent%20-%20please%20wait.mp4'
