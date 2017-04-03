@@ -341,65 +341,8 @@ export default class Login extends React.Component {
                     !window.navigator.mozGetUserMedia && noWebRtcWarning}
 
             <h2>Configure the demo</h2>
-                <label>
-                    <input
-                        type="radio"
-                        name="login_type"
-                        defaultChecked={ this.state.loginType === 'guest' }
-                        onChange={ (e)=>{ this.onGuestLoginClicked(e); } }
-                    />
-                    Use as guest
-                </label>
-
-                <label>
-                    <input
-                        type="radio"
-                        name="login_type"
-                        defaultChecked={ this.state.loginType === 'userId' }
-                        onChange={ (e)=>{ this.onMatrixLoginClicked(e); } }
-                    />
-                    Log in as existing Matrix User
-                </label>
 
                 <form onSubmit={this.onSubmitForm}>
-                    <div style={this.state.loginType === 'guest' ? {display: 'none'} : null}>
-                        <h3>Matrix Login details:</h3>
-                        <label>
-                            user name:
-                            <input
-                                type="text"
-                                name="username"
-                                size="48"
-                                placeholder="User name"
-                                autoFocus
-                                value={this.state.username}
-                                onChange={this.onUsernameChanged} />
-                        </label>
-
-                        <label>
-                            password:
-                            <input
-                                type="password"
-                                name="password"
-                                size="48"
-                                value={this.state.password}
-                                onChange={this.onPasswordChanged} />
-                        </label>
-
-                        <label>
-                            homeserver URL:
-                            <input
-                                type="text"
-                                name="homeserver"
-                                size="48"
-                                placeholder="Home server URL"
-                                value={this.state.homeserver}
-                                onChange={this.onHomeserverChanged} />
-                        </label>
-
-                        <br/>
-                        You can register for an account using a <a href="https://matrix.org/docs/projects/try-matrix-now.html">Matrix client</a> such as <a href="https://riot.im/app">Riot</a>.
-                    </div>
 
                     <p>
                         To try out 1:1 calls in VR and have a guide-like call going throughout the demo enter the Matrix ID of someone
@@ -469,7 +412,7 @@ export default class Login extends React.Component {
                         The point of the demo is to show what happens when you plug <a href="https://github.com/matrix-org/matrix-js-sdk">matrix-js-sdk</a>
                         , <a href="https://webvr.rocks">WebVR</a> and <a href="https://aframe.io">A-Frame</a> together, and take one step closer to an
                         open standards based VR metaverse :D  For more details, see <a href="https://matrix.org/blog">the blog post</a>.
-                        Source code available (Apache License) on <a href="https://github.com/matrix-org/mxvr-demo">Github</a>.
+                        Source code available (Apache License) on <a href="https://github.com/matrix-org/matrix-vr-demo">Github</a>.
                     </div>
                     <p>
                         The demo should work on any browser capable of WebVR & WebRTC - i.e. Chrome or Firefox on
