@@ -314,7 +314,7 @@ export default class Login extends React.Component {
         </div>;
 
         const noWebRtcWarning = <div className="panel warningPanel">
-            Your browser does not support WebRTC. You can proceed anyway, but none of the video calling will work, and the demo will be almost useless!
+            Your browser does not support WebRTC. You can proceed anyway, but none of the video calling will work, and the demo will be almost useless! Please try using latest Chrome or Firefox.
         </div>;
 
         const loginForm = <div>
