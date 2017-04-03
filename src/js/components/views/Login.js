@@ -434,6 +434,10 @@ export default class Login extends React.Component {
                         It runs on plain phones & desktop/laptops, as well as <a href="https://vr.google.com/cardboard">Google Cardboard</a> devices,
                         all the way up to the <a href="https://vive.com">HTC Vive</a> and <a href="https://oculus.com">Oculus Rift</a>.
                         If you have a Vive or Rift you'll need to <a href="https://webvr.rocks">enable full WebVR support in your browser</a>.
+                        N.B. that WebVR Chromium builds do not include H.264 which is required for video playback in the demo.
+                    </p>
+                    <p>
+                        To discuss the demo, come hang out in <a href="https://riot.im/app/#/room/#vr:matrix.org">#vr:matrix.org</a>.
                     </p>
                 </div>
 
