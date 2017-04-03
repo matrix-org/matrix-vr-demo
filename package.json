@@ -2,6 +2,7 @@
   "name": "mxvr-tourism-demo",
   "version": "0.0.1",
   "description": "Matrix VR tourism demo",
+  "license": "Apache-2.0",
   "dependencies": {
     "aframe": "matrix-org/aframe#master",
     "aframe-auto-detect-controllers-component": "^0.1.4",
