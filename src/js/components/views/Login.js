@@ -412,7 +412,7 @@ export default class Login extends React.Component {
                         The point of the demo is to show what happens when you plug <a href="https://github.com/matrix-org/matrix-js-sdk">matrix-js-sdk</a>
                         , <a href="https://webvr.rocks">WebVR</a> and <a href="https://aframe.io">A-Frame</a> together, and take one step closer to an
                         open standards based VR metaverse :D  For more details, see <a href="https://matrix.org/blog">the blog post</a>.
-                        Source code available (Apache License) on <a href="https://github.com/matrix-org/mxvr-demo">Github</a>.
+                        Source code available (Apache License) on <a href="https://github.com/matrix-org/matrix-vr-demo">Github</a>.
                     </div>
                     <p>
                         The demo should work on any browser capable of WebVR & WebRTC - i.e. Chrome or Firefox on
