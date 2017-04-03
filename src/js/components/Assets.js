@@ -99,19 +99,7 @@ export default class Assets extends React.Component {
                 <video id='lobbyVideo' autoPlay></video>
 
                 {/* Tourism scene video playlist */}
-                <span id='tourism'>
-                    <video id='ski-video1'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski1.mp4'
-                        muted crossOrigin></video>
-                    <video id='ski-video2'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski2.mp4'
-                        muted crossOrigin></video>
-                    <video id='ski-video3'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski3.mp4'
-                        muted crossOrigin></video>
-                    <video id='ski-video4'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski4.mp4'
-                        muted crossOrigin></video>
+                <span id='tourism-mixins'>
                     <a-mixin id='ski-video1-mixin' rotation='-5 -90 30' />
                     <a-mixin id='ski-video2-mixin' rotation='-10 -90 15' />
                     <a-mixin id='ski-video3-mixin' rotation='0 -90 30' />
@@ -119,29 +107,7 @@ export default class Assets extends React.Component {
                 </span>
 
                 {/* Ringback video playlist */}
-                <span id='ringback'>
-                    <video id='ringback-welcome'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Welcome%20to%20the%20Matrix.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-connecting'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Connecting%20to%20agent%20-%20please%20wait.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-connecting2'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Connect%20to%20agent.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-hang-on-in-there'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Hang%20on%20in%20there3.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-ring-ring-ring'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Ring%20ring%20ring.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-not-waiting'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Not%20waiting%20any%20longer.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-while-you-are-here'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/While%20you%20are%20here.mp4'
-                        preload='auto' crossOrigin></video>
-
+                <span id='ringback-mixins'>
                     <a-mixin id='ringback-connecting-mixin' delay='1000' />
                     <a-mixin id='ringback-connecting2-mixin' delay='1000' />
                     <a-mixin id='ringback-hang-on-in-there-mixin' delay='1000' />

@@ -18,6 +18,7 @@ limitations under the License.
 import React from 'react';
 import {Entity} from 'aframe-react';
 import Call from '../structures/Call';
+import Playlist from '../structures/Playlist';
 import {default as dispatcher} from '../../common/dispatcher';
 import 'aframe-look-at-component';
 
@@ -40,6 +41,37 @@ export default class Ringback extends React.Component {
         this.showRingbackTimeout = null;
         this.showVideoTimeout = null;
         this.playVideoTimeout = null;
+
+        this.playlistItems = [
+            {
+                id: 'ringback-welcome',
+                src: 'https://matrix.org/vrdemo_resources/video/ringback/Welcome%20to%20the%20Matrix.mp4',
+            },
+            {
+                id: 'ringback-connecting',
+                src: 'https://matrix.org/vrdemo_resources/video/ringback/Connecting%20to%20agent%20-%20please%20wait.mp4',
+            },
+            {
+                id: 'ringback-connecting2',
+                src: 'https://matrix.org/vrdemo_resources/video/ringback/Connect%20to%20agent.mp4',
+            },
+            {
+                id: 'ringback-hang-on-in-there',
+                src: 'https://matrix.org/vrdemo_resources/video/ringback/Hang%20on%20in%20there3.mp4',
+            },
+            {
+                id: 'ringback-ring-ring-ring',
+                src: 'https://matrix.org/vrdemo_resources/video/ringback/Ring%20ring%20ring.mp4',
+            },
+            {
+                id: 'ringback-not-waiting',
+                src: 'https://matrix.org/vrdemo_resources/video/ringback/Not%20waiting%20any%20longer.mp4',
+            },
+            {
+                id: 'ringback-while-you-are-here',
+                src: 'https://matrix.org/vrdemo_resources/video/ringback/While%20you%20are%20here.mp4',
+            },
+        ];
     }
 
     componentDidMount() {
@@ -222,6 +254,7 @@ export default class Ringback extends React.Component {
                 loaded: this.onLoaded,
             }}
             rotation={this.props.rotation}>
+            <Playlist playlistId='ringback' items={this.playlistItems}/>
             {this.videos[this.state.videoIndex] && (
                 <a-plane
                     id='videoPlane'

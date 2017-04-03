@@ -18,6 +18,7 @@ limitations under the License.
 /*jshint esversion: 6 */
 import {Entity} from 'aframe-react';
 import React from 'react';
+import Playlist from './structures/Playlist';
 import {default as dispatcher} from '../common/dispatcher';
 
 function degreesToRadians(degrees) {
@@ -44,6 +45,24 @@ export default class TourismScene extends React.Component {
         this.clickHandler = this.clickHandler.bind(this);
         this.playNextVideo = this.playNextVideo.bind(this);
         this._onKeyEvent = this._onKeyEvent.bind(this);
+
+        this.playlistItems = [
+            {
+                id: 'ski-video1',
+                src: 'https://matrix.org/vrdemo_resources/video/360/ski1.mp4',
+            },
+            {
+                id: 'ski-video2',
+                src: 'https://matrix.org/vrdemo_resources/video/360/ski2.mp4',
+            },
+            {
+                id: 'ski-video3',
+                src: 'https://matrix.org/vrdemo_resources/video/360/ski3.mp4',
+            },
+            {
+                id: 'ski-video4',
+                src: 'https://matrix.org/vrdemo_resources/video/360/ski4.mp4',
+            }];
     }
 
     onLoaded() {
@@ -60,6 +79,7 @@ export default class TourismScene extends React.Component {
         this.transformUvs(0);
 
         // Play the video and set up event listeners
+        this.videos[this.state.videoIndex].currentTime = 0;
         this.videos[this.state.videoIndex].play();
         this.videos[this.state.videoIndex].addEventListener('ended', this.playNextVideo);
         dispatcher.on('keyEvent', this._onKeyEvent);
@@ -191,6 +211,7 @@ export default class TourismScene extends React.Component {
             <Entity events={{
                 loaded: this.onLoaded,
             }}>
+                <Playlist playlistId='tourism' items={this.playlistItems}/>
                 <a-videosphere
                     id='videoSphere1'
                     radius='100'
