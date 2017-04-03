@@ -17,6 +17,7 @@ limitations under the License.
 
 import React from 'react';
 import {default as SillyId} from 'sillyid';
+import {default as webglDetect} from 'webgl-detect';
 
 import {getParameterByName} from '../structures/utils';
 
@@ -156,7 +157,7 @@ export default class Login extends React.Component {
         let alias;
         do {
             alias = this.sid.generate();
-        } while(alias.length > 20);
+        } while (alias.length > 20);
         return alias;
     }
 
@@ -321,40 +322,25 @@ export default class Login extends React.Component {
         const link = `${window.location.origin}${window.location.pathname}#` +
             makeHash(roomAlias, this.state.peerId);
 
-        return (
-            <div className="login">
-                <a href="https://matrix.org">
-                    <img className="login_logo" src="images/matrix.svg" width="200"/>
-                </a>
-                <h1>Matrix + WebVR + WebRTC</h1>
+        const noWebVrWarning = <div className="panel infoPanel">
+            Your browser does not support WebVR.
+            You can still use the demo in non-VR mode. However, please see <a href="https://webvr.rocks/">WebVR.rocks</a> for details of how to obtain a browser with support for VR devices.
+        </div>;
 
-                <div className="description">
-                    <div>
-                        This demo showcases <a href="https://matrix.org">Matrix</a> as an open decentralised comms layer for the open VR web, illustrating:
-                        <ul>
-                            <li>1:1 calls between WebVR apps and arbitrary Matrix users, in a "VR tour guide" scenario.</li>
-                            <li>Video conferencing within WebVR using WebRTC calls signalled over Matrix</li>
-                        </ul>
-                        The point of the demo is to show what happens when you plug <a href="https://github.com/matrix-org/matrix-js-sdk">matrix-js-sdk</a>
-                        , <a href="https://webvr.rocks">WebVR</a> and <a href="https://aframe.io">A-Frame</a> together, and take one step closer to an
-                        open standards based VR metaverse :D  For more details, see <a href="https://matrix.org/blog">the blog post</a>.
-                        Source code available (Apache License) on <a href="https://github.com/matrix-org/mxvr-demo">Github</a>.
-                    </div>
-                    <p>
-                        The demo should work on any browser capable of WebVR & WebRTC - i.e. Chrome or Firefox on
-                        Desktop or Android.  Browsers on iOS sadly still have no WebRTC, and nor does Safari on macOS.
-                        It runs on plain phones & desktop/laptops, as well as <a href="https://vr.google.com/cardboard">Google Cardboard</a> devices,
-                        all the way up to the <a href="https://vive.com">HTC Vive</a> and <a href="https://oculus.com">Oculus Rift</a>.
-                        If you have a Vive or Rift you'll need to <a href="https://webvr.rocks">enable full WebVR support in your browser</a>.
-                    </p>
-                </div>
+        const noWebGlWarning = <div className="panel errorPanel">
+            This demo requires WebGL. Please make sure that it supported by your browser and that it is enabled in your settings!
+        </div>;
 
-                <div className="screenies">
-                    <img src="images/s1.jpg" width="240" height="150"/> <img src="images/s2.jpg" width="240" height="150"/> <img src="images/s3.jpg" width="240" height="150"/>
-                </div>
+        const noWebRtcWarning = <div className="panel warningPanel">
+            Your browser does not support WebRTC. You can proceed anyway, but none of the video calling will work, and the demo will be almost useless! Please try using latest Chrome or Firefox.
+        </div>;
 
-                <h2>Configure the demo</h2>
+        const loginForm = <div>
+            {!window.hasNativeWebVRImplementation && noWebVrWarning}
+            {!window.navigator.getUserMedia && !window.navigator.webkitGetUserMedia &&
+                    !window.navigator.mozGetUserMedia && noWebRtcWarning}
 
+            <h2>Configure the demo</h2>
                 <label>
                     <input
                         type="radio"
@@ -464,6 +450,41 @@ export default class Login extends React.Component {
                         <input type="submit" value="Go VR!!" />
                     </div>
                 </form>
+            </div>;
+
+        return (
+            <div className="login">
+                <a href="https://matrix.org">
+                    <img className="login_logo" src="images/matrix.svg" width="200"/>
+                </a>
+                <h1>Matrix + WebVR + WebRTC</h1>
+
+                <div className="description">
+                    <div>
+                        This demo showcases <a href="https://matrix.org">Matrix</a> as an open decentralised comms layer for the open VR web, illustrating:
+                        <ul>
+                            <li>1:1 calls between WebVR apps and arbitrary Matrix users, in a "VR tour guide" scenario.</li>
+                            <li>Video conferencing within WebVR using WebRTC calls signalled over Matrix</li>
+                        </ul>
+                        The point of the demo is to show what happens when you plug <a href="https://github.com/matrix-org/matrix-js-sdk">matrix-js-sdk</a>
+                        , <a href="https://webvr.rocks">WebVR</a> and <a href="https://aframe.io">A-Frame</a> together, and take one step closer to an
+                        open standards based VR metaverse :D  For more details, see <a href="https://matrix.org/blog">the blog post</a>.
+                        Source code available (Apache License) on <a href="https://github.com/matrix-org/mxvr-demo">Github</a>.
+                    </div>
+                    <p>
+                        The demo should work on any browser capable of WebVR & WebRTC - i.e. Chrome or Firefox on
+                        Desktop or Android.  Browsers on iOS sadly still have no WebRTC, and nor does Safari on macOS.
+                        It runs on plain phones & desktop/laptops, as well as <a href="https://vr.google.com/cardboard">Google Cardboard</a> devices,
+                        all the way up to the <a href="https://vive.com">HTC Vive</a> and <a href="https://oculus.com">Oculus Rift</a>.
+                        If you have a Vive or Rift you'll need to <a href="https://webvr.rocks">enable full WebVR support in your browser</a>.
+                    </p>
+                </div>
+
+                <div className="screenies">
+                    <img src="images/s1.jpg" width="240" height="150"/> <img src="images/s2.jpg" width="240" height="150"/> <img src="images/s3.jpg" width="240" height="150"/>
+                </div>
+
+                {webglDetect ? loginForm : noWebGlWarning}
 
                 <div>
                     If you don’t have a way to run the demo, you can checkout the demo tour video below.

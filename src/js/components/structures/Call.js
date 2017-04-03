@@ -18,12 +18,6 @@ limitations under the License.
 import {EventEmitter} from 'events';
 import {createVideoElement} from './utils';
 
-if (!window.navigator.getUserMedia && !window.navigator.webkitGetUserMedia &&
-        !window.navigator.mozGetUserMedia) {
-    alert('Your browser does not support WebRTC\n' +
-        'The demo functionality will be severely limited');
-}
-
 const CALL_ROOM_NAME = 'Matrix VR Demo';
 
 export default class Call extends EventEmitter {
