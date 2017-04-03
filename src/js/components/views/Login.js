@@ -303,7 +303,25 @@ export default class Login extends React.Component {
     render() {
         const roomAlias = getRoomAlias(this.state.roomAlias, this.state.homeserver);
         const link = `${window.location.origin}${window.location.pathname}#/room/${roomAlias}`;
+
+        const noWebVrWarning = <div className="warningPanel">
+            Your browser does not support WebVR.
+            You can still use the demo in non-VR mode. However, please see <a href="https://webvr.rocks/">WebVR.rocks</a> for details of how to obtain a browser with support for VR devices.
+        </div>;
+
+        const noWebGlWarning = <div className="errorPanel">
+            This demo requires WebGL. Please make sure that it supported by your browser and that it is enabled in your settings!
+        </div>;
+
+        const noWebRtcWarning = <div className="warningPanel">
+            Your browser does not support WebRTC. The demo functionality will be severely limited!
+        </div>;
+
         const loginForm = <div>
+            {!window.hasNativeWebVRImplementation && noWebVrWarning}
+            {!window.navigator.getUserMedia && !window.navigator.webkitGetUserMedia &&
+                    !window.navigator.mozGetUserMedia && noWebRtcWarning}
+
             <h2>Configure the demo</h2>
                 <label>
                     <input
@@ -415,11 +433,6 @@ export default class Login extends React.Component {
                 </form>
             </div>;
 
-        const noWebglWarning = <div className="warningPanel">
-            This demo requires WebGL. Please make sure that it supported by your browser and that it is enabled in your settings!
-        </div>;
-
-        console.warn("Webgl = ", webglDetect);
         return (
             <div className="login">
                 <a href="https://matrix.org">
@@ -452,7 +465,7 @@ export default class Login extends React.Component {
                     <img src="images/s1.jpg" width="240" height="150"/> <img src="images/s2.jpg" width="240" height="150"/> <img src="images/s3.jpg" width="240" height="150"/>
                 </div>
 
-                {webglDetect ? loginForm : noWebglWarning}
+                {webglDetect ? loginForm : noWebGlWarning}
 
                 <div>
                     If you don’t have a way to run the demo, you can checkout the demo tour video below.
