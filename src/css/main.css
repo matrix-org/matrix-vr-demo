@@ -22,7 +22,7 @@ body {
     background-image: url('../images/aurora.jpg');
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-position: center; 
+    background-position: center;
     margin: 0px;
 }
 
@@ -129,4 +129,14 @@ a:visited {
 .copyright {
     font-size: 12px;
     color: #888;
+}
+
+.warningPanel {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #a94442;
+    margin: 15px 0;
+    padding: 15px;
+    border-radius: 5px;
+    line-height: 1.5em;
 }

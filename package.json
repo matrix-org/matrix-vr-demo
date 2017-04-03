@@ -18,7 +18,8 @@
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-loader": "^2.4.0",
-    "sillyid": "^0.2.0"
+    "sillyid": "^0.2.0",
+    "webgl-detect": "0.0.1"
   },
   "scripts": {
     "build": "(cd node_modules/matrix-js-sdk && npm i && npm run build) && webpack",
