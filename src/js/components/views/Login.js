@@ -79,6 +79,7 @@ export default class Login extends React.Component {
         this.onMatrixLoginClicked = this.onMatrixLoginClicked.bind(this);
         this.onGenerateRoomNameClicked = this.onGenerateRoomNameClicked.bind(this);
         this.onClearLocalStorageClicked = this.onClearLocalStorageClicked.bind(this);
+        this.canPlayH264 = this.canPlayH264.bind(this);
 
         this.generateRoomAlias = this.generateRoomAlias.bind(this);
 
@@ -317,6 +318,11 @@ export default class Login extends React.Component {
         this.matrixHomeserver = null;
     }
 
+    canPlayH264() {
+        const v = document.createElement('video');
+        return !!(v.canPlayType && v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
+    }
+
     render() {
         const roomAlias = getRoomAlias(this.state.roomAlias, this.state.homeserver);
         const link = `${window.location.origin}${window.location.pathname}#` +
@@ -335,10 +341,18 @@ export default class Login extends React.Component {
             Your browser does not support WebRTC. You can proceed anyway, but none of the video calling will work, and the demo will be almost useless! Please try using latest Chrome or Firefox.
         </div>;
 
+        const noH264Warning = <div className="panel warningPanel">
+            Your browser does not support the H.264 video codec. You can proceed anyway, but some videos in the lobby and tourism scenes will not work. Please try using latest Chrome or Firefox.
+        </div>;
+
         const loginForm = <div>
+            {/* Provide an info. panel warning if browser does not support WebVR */}
             {!window.hasNativeWebVRImplementation && noWebVrWarning}
+            {/* Warn if browser does not support WebRTC */}
             {!window.navigator.getUserMedia && !window.navigator.webkitGetUserMedia &&
                     !window.navigator.mozGetUserMedia && noWebRtcWarning}
+            {/* Warn if browser does not support H.264, required for static videos */}
+            {!this.canPlayH264() && noH264Warning}
 
             <h2>Configure the demo</h2>
 
