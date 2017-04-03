@@ -144,7 +144,13 @@ a:visited {
     border: 1px solid #ffffff;
 }
 
-.infoPanel a {
+.infoPanel-trans {
+    background-color: rgba(157, 193, 224, 0.35);
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+
+.infoPanel a, .infoPanel-trans a {
     color: #ffffff;
 }
 
