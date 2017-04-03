@@ -304,17 +304,17 @@ export default class Login extends React.Component {
         const roomAlias = getRoomAlias(this.state.roomAlias, this.state.homeserver);
         const link = `${window.location.origin}${window.location.pathname}#/room/${roomAlias}`;
 
-        const noWebVrWarning = <div className="warningPanel">
+        const noWebVrWarning = <div className="panel infoPanel">
             Your browser does not support WebVR.
             You can still use the demo in non-VR mode. However, please see <a href="https://webvr.rocks/">WebVR.rocks</a> for details of how to obtain a browser with support for VR devices.
         </div>;
 
-        const noWebGlWarning = <div className="errorPanel">
+        const noWebGlWarning = <div className="panel errorPanel">
             This demo requires WebGL. Please make sure that it supported by your browser and that it is enabled in your settings!
         </div>;
 
-        const noWebRtcWarning = <div className="warningPanel">
-            Your browser does not support WebRTC. The demo functionality will be severely limited!
+        const noWebRtcWarning = <div className="panel warningPanel">
+            Your browser does not support WebRTC. You can proceed anyway, but none of the video calling will work, and the demo will be almost useless!
         </div>;
 
         const loginForm = <div>
