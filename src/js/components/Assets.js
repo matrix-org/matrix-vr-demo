@@ -123,31 +123,6 @@ export default class Assets extends React.Component {
                     <video id='ringback-welcome'
                         src='https://matrix.org/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4'
                         preload='auto' crossOrigin></video>
-                    <video id='ringback-connecting'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Connecting%20to%20agent%20-%20please%20wait.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-connecting2'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Connect%20to%20agent.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-hang-on-in-there'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Hang%20on%20in%20there3.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-ring-ring-ring'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Ring%20ring%20ring.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-not-waiting'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Not%20waiting%20any%20longer.mp4'
-                        preload='auto' crossOrigin></video>
-                    <video id='ringback-while-you-are-here'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/While%20you%20are%20here.mp4'
-                        preload='auto' crossOrigin></video>
-
-                    <a-mixin id='ringback-connecting-mixin' delay='1000' />
-                    <a-mixin id='ringback-connecting2-mixin' delay='1000' />
-                    <a-mixin id='ringback-hang-on-in-there-mixin' delay='1000' />
-                    <a-mixin id='ringback-ring-ring-ring-mixin' delay='1000' />
-                    <a-mixin id='ringback-not-waiting-mixin' delay='0' />
-                    <a-mixin id='ringback-while-you-are-here-mixin' delay='10000' />
                 </span>
 
             </a-assets>
