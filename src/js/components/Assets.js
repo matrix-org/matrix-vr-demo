@@ -122,7 +122,7 @@ export default class Assets extends React.Component {
                 <span id='ringback'>
                     <video id='ringback-welcome'
                         src='https://matrix.org/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4'
-                        preload='auto' crossOrigin></video>
+                        preload='auto' crossOrigin muted></video>
                 </span>
 
             </a-assets>
