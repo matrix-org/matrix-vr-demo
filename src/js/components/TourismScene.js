@@ -67,7 +67,8 @@ export default class TourismScene extends React.Component {
 
     onLoaded() {
         console.warn('TourismScene loaded.');
-        this.setState({videoIndex: 0});
+        const newIndex = 0;
+        this.setState({videoIndex: newIndex});
 
         // Set up music
         this.music = document.getElementById('ski-sunday-music');
@@ -79,9 +80,9 @@ export default class TourismScene extends React.Component {
         this.transformUvs(0);
 
         // Play the video and set up event listeners
-        this.videos[this.state.videoIndex].currentTime = 0;
-        this.videos[this.state.videoIndex].play();
-        this.videos[this.state.videoIndex].addEventListener('ended', this.playNextVideo);
+        this.videos[newIndex].currentTime = 0;
+        this.videos[newIndex].play();
+        this.videos[newIndex].addEventListener('ended', this.playNextVideo);
         dispatcher.on('keyEvent', this._onKeyEvent);
     }
 
@@ -130,12 +131,15 @@ export default class TourismScene extends React.Component {
     }
 
     playNextVideo() {
+        // console.warn("This videos: ", this.videos, this.state.videoIndex);
+
         this.videos[this.state.videoIndex].removeEventListener('ended', this.playNextVideo);
+
         const newIndex = this.state.videoIndex + 1;
         this.setState({videoIndex: newIndex});
 
         if (newIndex < this.videos.length) {
-            console.log('Playing next video in queue');
+            console.log('Playing next video in queue', this.videos[newIndex]);
             this.videos[newIndex].addEventListener('ended', this.playNextVideo);
             this.transformUvs(newIndex);
             this.videos[newIndex].currentTime = 0; // Seek to begining of video
