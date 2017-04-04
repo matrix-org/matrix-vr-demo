@@ -59,7 +59,7 @@ function getRoomAlias(roomAlias, homeserver) {
 function makeHash(roomAlias, peerId) {
     let queryParams = '';
     if (peerId && peerId.length > 0) {
-        queryParams = `?guestId=${peerId}`;
+        queryParams = `?guideId=${peerId}`;
     }
     return `/room/${getRoomAlias(roomAlias, CONF_HOME_SERVER)}${queryParams}`;
 }
