@@ -20,49 +20,69 @@ import React from 'react';
 export default class Playlist extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { loadIndex: 0};
+        this.state = { loadIndex: -1};
 
+        this.assets = document.querySelector('#assets #' + this.props.playlistId);
         this.loadNext = this.loadNext.bind(this);
     }
 
-    loadNext(e) {
-        e.target.removeEventListener('play', this.loadNext);
+    componentDidMount() {
+        this._createElements();
+    }
 
-        if (this.state.loadIndex < this.props.items.length) {
-            console.log('Loading next video in playlist', e);
+    componentWillUnmount() {
+        document.querySelectorAll('#assets #' + this.props.playlistId + ' video').forEach(function(video){
+            video.removeEventListener('play', this.loadNext());
+        }.bind(this));
+    }
+
+    _createElements() {
+        this.props.items.forEach(function(item, index) {
+            if (!document.getElementById(item.id)) {
+                const video = document.createElement('video');
+                video.setAttribute('id', item.id);
+                video.setAttribute('crossOrigin', true);
+                this.assets.appendChild(video);
+            }
+        }.bind(this));
+        this.loadNext();
+    }
+
+    loadNext(e) {
+        if (e) {
+            e.target.removeEventListener('play', this.loadNext);
+        }
+
+        const loadIndex = this.state.loadIndex + 1;
+        if (loadIndex < this.props.items.length) {
+            console.log('Loading next video in playlist', this.props.playlistId);
+
+            const item = this.props.items[loadIndex];
+            const video = document.getElementById(item.id);
+            if (!video.src) {
+                video.setAttribute('src', item.src);
+            } else {
+                console.warn('Video ', item.id, ' has already been loaded');
+            }
+
             this.setState({
-                loadIndex: this.state.loadIndex + 1,
+                loadIndex: loadIndex,
             });
+            video.addEventListener('play', this.loadNext);
         } else {
             console.log('All playlist items loaded');
         }
     }
 
     render() {
-        return (
-            <span id={this.props.playlistId}>
-                {this.props.items.map(function(item, index) {
-                    if (index <= this.state.loadIndex) {
-                        return <video id={item.id}
-                            key={index}
-                            src={item.src}
-                            onPlay={this.loadNext}
-                            crossOrigin></video>;
-                    }
-
-                    return <video id={item.id}
-                        key={index}
-                        crossOrigin></video>;
-                }.bind(this))}
-            </span>
-         );
+        return null;
     }
 }
 
 Playlist.propTypes = {
     playlistId: React.PropTypes.string.isRequired,
     items: React.PropTypes.arrayOf(React.PropTypes.shape({
-     src: React.PropTypes.string.isRequired,
-     id: React.PropTypes.string.isRequired,
+    src: React.PropTypes.string.isRequired,
+    id: React.PropTypes.string.isRequired,
    })).isRequired,
 };
