@@ -181,6 +181,8 @@ export default class Lobby extends React.Component {
                         ringbackDidMount={this.ringbackDidMount}
                         ringbackDidUnmount={this.ringbackDidUnmount}
                         ringbackDidHide={this.ringbackDidHide}
+                        ringbackPlayed={this.props.ringbackPlayed}
+                        ringbackDidPlay={this.props.ringbackDidPlay}
                     />
                 )}
 
@@ -354,4 +356,6 @@ Lobby.propTypes = {
     call: React.PropTypes.instanceOf(Call),
     conference: React.PropTypes.instanceOf(FullMeshConference),
     room: React.PropTypes.string.isRequired,
+    ringbackPlayed: React.PropTypes.bool,
+    ringbackDidPlay: React.PropTypes.func,
 };
