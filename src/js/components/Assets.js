@@ -99,7 +99,10 @@ export default class Assets extends React.Component {
                 <video id='lobbyVideo' autoPlay></video>
 
                 {/* Tourism scene video playlist */}
-                <span id='tourism-mixins'>
+                <span id='tourism'>
+                    <video id='ski-video1'
+                        src='https://matrix.org/vrdemo_resources/video/360/ski1.mp4'
+                        muted crossOrigin></video>
                     <a-mixin id='ski-video1-mixin' rotation='-5 -90 30' />
                     <a-mixin id='ski-video2-mixin' rotation='-10 -90 15' />
                     <a-mixin id='ski-video3-mixin' rotation='0 -90 30' />
@@ -108,9 +111,6 @@ export default class Assets extends React.Component {
 
                 {/* Ringback video playlist */}
                 <span id='ringback'>
-                    <video id='ringback-welcome'
-                        src='https://matrix.org/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4'
-                        preload='auto' crossOrigin muted></video>
                 </span>
 
             </a-assets>
