@@ -174,7 +174,6 @@ export default class Ringback extends React.Component {
         console.warn('Playing video ' + this.videos[this.state.videoIndex].id);
         this.playVideoTimeout = null;
         this.videos[this.state.videoIndex].currentTime = 0;
-        console.log("Ferkin vijeo:", this.videos[this.state.videoIndex]);
 
         // Ensure that current mute status is preserved
         this.videos[this.state.videoIndex].muted = this.state.muted;
