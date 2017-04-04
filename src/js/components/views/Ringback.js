@@ -29,7 +29,7 @@ export default class Ringback extends React.Component {
             videoIndex: 0,
             muted: false,
         };
-        this.onLoaded = this.onLoaded.bind(this);
+        this.startRingback = this.startRingback.bind(this);
         this.stopRingback = this.stopRingback.bind(this);
         this.ringbackHidden = this.ringbackHidden.bind(this);
         this.playNextVideo = this.playNextVideo.bind(this);
@@ -88,11 +88,16 @@ export default class Ringback extends React.Component {
         // console.warn('Videos:', this.videos, this.videos[this.state.videoIndex]);
 
         dispatcher.on('keyEvent', this._onKeyEvent);
+
+        if (!this.props.ringbackPlayed) {
+            dispatcher.addListener('transitionInComplete', this.startRingback);
+        } else {
+            console.warn('Ringback has already been played. Not starting');
+        }
     }
 
     componentWillUnmount() {
         this.stopVideo();
-        this.refs.videoPlane.sceneEl.removeEventListener('loaded', this.sceneLoaded.bind(this));
         this.refs.videoPlane.removeEventListener('animationend', this.ringbackHidden);
         dispatcher.removeListener('keyEvent', this._onKeyEvent);
 
@@ -117,13 +122,16 @@ export default class Ringback extends React.Component {
         }
     }
 
-    onLoaded() {
-        // console.warn('Ringback panel loaded', this);
-        this.refs.videoPlane.sceneEl.addEventListener('loaded', this.sceneLoaded.bind(this));
+    componentDidUpdate(prevProps, prevState) {
+        if (!prevProps.call && this.props.call) {
+            console.warn('Ringback adding call active listener', this.props.call);
+            this.props.call.on('callActive', this.stopRingback);
+        }
     }
 
-    sceneLoaded() {
-        // console.warn('Ringback: scene loaded');
+    startRingback() {
+        console.warn('Ringback: scene loaded');
+        dispatcher.removeListener('transitionInComplete', this.startRingback);
         this.setState({videoIndex: 0});
 
         this.showRingbackTimeout = setTimeout(() => {
@@ -133,15 +141,12 @@ export default class Ringback extends React.Component {
                 this.playVideoTimeout = null;
                 console.warn('Starting ringback video');
                 this.playVideo();
+
+                if (this.props.ringbackDidPlay) {
+                    this.props.ringbackDidPlay();
+                }
             }, 500);
         }, this.props.startDelay);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (!prevProps.call && this.props.call) {
-            console.warn('Ringback adding call active listener', this.props.call);
-            this.props.call.on('callActive', this.stopRingback);
-        }
     }
 
     stopRingback() {
@@ -250,12 +255,10 @@ export default class Ringback extends React.Component {
 
     render() {
         return (
-            <Entity events={{
-                loaded: this.onLoaded,
-            }}
+            <Entity
             rotation={this.props.rotation}>
             <Playlist playlistId='ringback' items={this.playlistItems}/>
-            {this.videos[this.state.videoIndex] && (
+                {this.videos[this.state.videoIndex] && (
                 <a-plane
                     id='videoPlane'
                     ref='videoPlane'
@@ -330,4 +333,6 @@ Ringback.propTypes = {
     ringbackDidMount: React.PropTypes.func,
     ringbackDidUnmount: React.PropTypes.func,
     ringbackDidHide: React.PropTypes.func,
+    ringbackPlayed: React.PropTypes.bool,
+    ringbackDidPlay: React.PropTypes.func,
 };

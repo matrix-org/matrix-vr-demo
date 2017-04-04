@@ -22,6 +22,7 @@ import TrackedControls from './TrackedControls';
 import CallView from './views/CallView';
 import Call from './structures/Call';
 import 'aframe-mouse-cursor-component';
+import {default as dispatcher} from '../common/dispatcher';
 
 export default class Person extends React.Component {
     constructor(props) {
@@ -55,6 +56,7 @@ export default class Person extends React.Component {
         const ele = e.target || e.srcElement; // for IE
         if (ele.id === 'transitionInOpacity') {        // Transition in complete
             console.warn('Transition in complete');
+            dispatcher.emit('transitionInComplete');
             this.setState({
                 transitionIn: false,
                 transitionBack: false,
@@ -62,6 +64,7 @@ export default class Person extends React.Component {
             });
         } else if (ele.id === 'transitionOutOpacity') {    // Transition out complete
             console.warn('Transition out complete');
+            dispatcher.emit('transitionOutComplete');
             this.setState({
                 transitioningOut: false,
             });

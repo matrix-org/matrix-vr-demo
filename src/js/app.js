@@ -51,7 +51,10 @@ class VRScene extends React.Component {
             stats: window.location.hostname === '127.0.0.1' ||
                 window.location.hostname === 'localhost',
             vrMode: false,
+            ringbackPlayed: false,
         };
+
+        this.ringbackDidPlay = this.ringbackDidPlay.bind(this);
     }
 
     onLoaded() {
@@ -176,6 +179,10 @@ class VRScene extends React.Component {
         }
     }
 
+    ringbackDidPlay() {
+        this.setState({ringbackPlayed: true});
+    }
+
     render() {
         console.warn('Rendering main scene');
 
@@ -213,7 +220,10 @@ class VRScene extends React.Component {
                             <Lobby
                                 room={this.props.room}
                                 call={this.state.call}
-                                conference={this.state.conference} />
+                                conference={this.state.conference}
+                                ringbackPlayed={this.state.ringbackPlayed}
+                                ringbackDidPlay={this.ringbackDidPlay}
+                            />
                         </Entity>
                     ) }
                     { this.props.room === 'tourismDemo' &&

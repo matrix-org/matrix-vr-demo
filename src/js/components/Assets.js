@@ -107,13 +107,10 @@ export default class Assets extends React.Component {
                 </span>
 
                 {/* Ringback video playlist */}
-                <span id='ringback-mixins'>
-                    <a-mixin id='ringback-connecting-mixin' delay='1000' />
-                    <a-mixin id='ringback-connecting2-mixin' delay='1000' />
-                    <a-mixin id='ringback-hang-on-in-there-mixin' delay='1000' />
-                    <a-mixin id='ringback-ring-ring-ring-mixin' delay='1000' />
-                    <a-mixin id='ringback-not-waiting-mixin' delay='0' />
-                    <a-mixin id='ringback-while-you-are-here-mixin' delay='10000' />
+                <span id='ringback'>
+                    <video id='ringback-welcome'
+                        src='https://matrix.org/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4'
+                        preload='auto' crossOrigin muted></video>
                 </span>
 
             </a-assets>
