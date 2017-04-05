@@ -31,20 +31,20 @@ export default class Playlist extends React.Component {
     }
 
     componentWillUnmount() {
-        document.querySelectorAll('#assets #' + this.props.playlistId + ' video').forEach(function(video){
+        document.querySelectorAll('#assets #' + this.props.playlistId + ' video').forEach((video) => {
             video.removeEventListener('play', this.loadNext());
-        }.bind(this));
+        });
     }
 
     _createElements() {
-        this.props.items.forEach(function(item, index) {
+        this.props.items.forEach((item, index) => {
             if (!document.getElementById(item.id)) {
                 const video = document.createElement('video');
                 video.setAttribute('id', item.id);
                 video.setAttribute('crossOrigin', true);
                 this.assets.appendChild(video);
             }
-        }.bind(this));
+        });
         this.loadNext();
     }
 
@@ -82,7 +82,7 @@ export default class Playlist extends React.Component {
 Playlist.propTypes = {
     playlistId: React.PropTypes.string.isRequired,
     items: React.PropTypes.arrayOf(React.PropTypes.shape({
-    src: React.PropTypes.string.isRequired,
-    id: React.PropTypes.string.isRequired,
-   })).isRequired,
+        src: React.PropTypes.string.isRequired,
+        id: React.PropTypes.string.isRequired,
+    })).isRequired,
 };
