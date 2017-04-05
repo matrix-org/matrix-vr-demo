@@ -328,9 +328,8 @@ export default class Login extends React.Component {
         const link = `${window.location.origin}${window.location.pathname}#` +
             makeHash(roomAlias, this.state.peerId);
 
-        const noWebVrWarning = <div className="panel infoPanel-trans">
-            Your browser does not support WebVR.
-            You can still use the demo in non-VR mode. However, please see <a href="https://webvr.rocks/">WebVR.rocks</a> for details of how to obtain a browser with support for VR devices.
+        const noWebVrWarning = <div className="panel infoPanel-trans small">
+            If you would like to use VR headset devices (such as the HTC Vive or Oculus Rift) you will need to use a browser with <a href="https://webvr.rocks/">WebVR support</a>
         </div>;
 
         const noWebGlWarning = <div className="panel errorPanel">
