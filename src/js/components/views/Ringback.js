@@ -42,12 +42,15 @@ export default class Ringback extends React.Component {
         this.showVideoTimeout = null;
         this.playVideoTimeout = null;
 
-        this.playlistItems = [
-            {
-                id: 'ringback-welcome',
-                src: 'https://matrix.org/vrdemo_resources/video/ringback/Welcome%20to%20the%20Matrix.mp4',
-            },
-        ];
+        this.playlist = new Playlist({
+            playlistId: 'ringback',
+            items: [
+                {
+                    id: 'ringback-welcome',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/Welcome%20to%20the%20Matrix.mp4',
+                },
+            ],
+        });
     }
 
     componentDidMount() {
@@ -80,6 +83,9 @@ export default class Ringback extends React.Component {
         if (this.showRingbackTimeout) clearTimeout(this.showRingbackTimeout);
         if (this.showVideoTimeout) clearTimeout(this.showVideoTimeout);
         if (this.playVideoTimeout) clearTimeout(this.playVideoTimeout);
+
+        // Clean up an unused / incomplete playlist resources
+        this.playlist.cleanup();
 
         // Callback to parent when component will unmount
         if (this.props.ringbackDidUnmount && typeof this.props.ringbackDidUnmount === 'function') {
@@ -233,7 +239,6 @@ export default class Ringback extends React.Component {
         return (
             <Entity
             rotation={this.props.rotation}>
-            <Playlist playlistId='ringback' items={this.playlistItems}/>
                 {this.videos[this.state.videoIndex] && (
                 <a-plane
                     id='videoPlane'

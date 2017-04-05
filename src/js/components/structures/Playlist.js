@@ -15,29 +15,24 @@ limitations under the License.
 */
 
 
-import React from 'react';
-
-export default class Playlist extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {loadIndex: -1};
-
-        this.assets = document.querySelector('#assets #' + this.props.playlistId);
-        this.loadNext = this.loadNext.bind(this);
-    }
-
-    componentDidMount() {
+export default class Playlist {
+    constructor(playlist) {
+        this.loadIndex = -1;
+        this.playlist = playlist;
+        this.assets = document.querySelector('#assets #' + this.playlist.playlistId);
         this._createElements();
     }
 
-    componentWillUnmount() {
-        document.querySelectorAll('#assets #' + this.props.playlistId + ' video').forEach((video) => {
-            video.removeEventListener('play', this.loadNext());
+    cleanup() {
+        document.querySelectorAll('#assets #' + this.playlist.playlistId + ' video')
+            .forEach((video) => {
+                video.removeEventListener('play', this.loadNext);
         });
     }
 
     _createElements() {
-        this.props.items.forEach((item, index) => {
+        console.warn("Creating %d playlist elements", this.playlist.items.length);
+        this.playlist.items.forEach((item, index) => {
             if (!document.getElementById(item.id)) {
                 const video = document.createElement('video');
                 video.setAttribute('id', item.id);
@@ -53,11 +48,11 @@ export default class Playlist extends React.Component {
             e.target.removeEventListener('play', this.loadNext);
         }
 
-        const loadIndex = this.state.loadIndex + 1;
-        if (loadIndex < this.props.items.length) {
-            console.log('Loading next video in playlist', this.props.playlistId);
+        this.loadIndex += 1;
+        if (this.loadIndex < this.playlist.items.length) {
+            console.log('Loading next video in playlist', this.playlist.playlistId);
 
-            const item = this.props.items[loadIndex];
+            const item = this.playlist.items[this.loadIndex];
             const video = document.getElementById(item.id);
             if (!video.src) {
                 video.setAttribute('src', item.src);
@@ -65,24 +60,14 @@ export default class Playlist extends React.Component {
                 console.warn('Video ', item.id, ' has already been loaded');
             }
 
-            this.setState({
-                loadIndex: loadIndex,
-            });
-            video.addEventListener('play', this.loadNext);
+            // If already playing, load the next item in the playlist
+            if (video.currentTime > 0 && !video.paused && !video.ended) {
+                this.loadNext();
+            } else {
+                video.addEventListener('play', this.loadNext);
+            }
         } else {
             console.log('All playlist items loaded');
         }
     }
-
-    render() {
-        return null;
-    }
 }
-
-Playlist.propTypes = {
-    playlistId: React.PropTypes.string.isRequired,
-    items: React.PropTypes.arrayOf(React.PropTypes.shape({
-        src: React.PropTypes.string.isRequired,
-        id: React.PropTypes.string.isRequired,
-    })).isRequired,
-};
