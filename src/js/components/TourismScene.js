@@ -80,10 +80,10 @@ export default class TourismScene extends React.Component {
         this.transformUvs(0);
 
         // Play the video and set up event listeners
-        this.videos[newIndex].currentTime = 0;
-        this.videos[newIndex].play();
         this.videos[newIndex].addEventListener('ended', this.playNextVideo);
         dispatcher.on('keyEvent', this._onKeyEvent);
+        this.videos[newIndex].currentTime = 0;
+        this.videos[newIndex].play();
     }
 
     _onKeyEvent(key) {
