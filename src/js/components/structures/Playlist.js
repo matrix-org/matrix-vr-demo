@@ -20,7 +20,7 @@ import React from 'react';
 export default class Playlist extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { loadIndex: -1};
+        this.state = {loadIndex: -1};
 
         this.assets = document.querySelector('#assets #' + this.props.playlistId);
         this.loadNext = this.loadNext.bind(this);
