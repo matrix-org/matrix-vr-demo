@@ -299,13 +299,13 @@ export default class Lobby extends React.Component {
                                 id='box'
                                 src='#object-phonebox'
                                 position={this.phoneboxPosition}
-                                // Make phonebox translucent if conf is not ready
-                                material={{
-                                    opacity: (this.props.conference && this.props.conference.roomId) ? 1 : 0.5
-                                }}
                                 rotation='0 45 0'
                                 scale='0 0 0'>
-
+                            {(!this.props.conference || !this.props.conference.roomId) && (<a-entity
+                                position="0 1.5 1"
+                                geometry="primitive: plane; height: 1; width: 1"
+                                material="side: double; src: #blocked; transparent: true; opacity: 0.5"
+                            ></a-entity>)}
                             {/*  Animate phonebox in */}
                             <a-animation
                                 id='transitionBoxGrowDepth'
