@@ -38,8 +38,10 @@ import InputEventHandler from './components/structures/InputEventHandler';
 
 import Login from './components/views/Login';
 
-let firstLoad = true;
 const SCENE_TRANSITION_DURATION = 1000;
+const defaultRoom = 'lobby';
+let firstLoad = true;
+let currentRoom = defaultRoom;
 
 class VRScene extends React.Component {
     constructor(props) {
@@ -237,7 +239,7 @@ class VRScene extends React.Component {
 
 VRScene.defaultProps = {
     client: null,
-    room: 'lobby',
+    room: defaultRoom,
 };
 
 VRScene.propTypes = {
@@ -246,12 +248,18 @@ VRScene.propTypes = {
 };
 
 function selectScene(scene, client) {
+    if ( scene === currentRoom) {
+        console.warn('Already in room %s, ignoring keypress', scene);
+        return;
+    }
+
     console.log(`Setting room to ${scene}`);
 
     document.getElementById('main-scene').emit('scene-change');
     setTimeout(() => {
         ReactDOM.render(<VRScene room={scene} client={client} />, sceneContainer);
     }, SCENE_TRANSITION_DURATION);
+    currentRoom = scene;
 }
 
 function switchScene(key, client) {
