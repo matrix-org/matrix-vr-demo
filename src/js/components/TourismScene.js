@@ -135,7 +135,10 @@ export default class TourismScene extends React.Component {
     }
 
     playNextVideo() {
-        this.videos[this.state.videoIndex].removeEventListener('ended', this.playNextVideo);
+        console.warn('playNextVideo, remove listener, index %d', this.state.videoIndex, this);
+        if (this.videos[this.state.videoIndex]) {
+            this.videos[this.state.videoIndex].removeEventListener('ended', this.playNextVideo);
+        }
 
         const newIndex = this.state.videoIndex + 1;
         this.setState({videoIndex: newIndex});
