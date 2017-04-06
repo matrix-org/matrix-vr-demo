@@ -215,18 +215,13 @@ class VRScene extends React.Component {
                     />
 
                     { (this.props.room === 'lobby' || this.props.room === 'videoConf') && (
-                        <Entity>
-                            {/* No need to render the sky with the lobby model */}
-                            {this.props.room === 'videoConf' && (
-                            <a-sky color='#222222'></a-sky>)}
-                            <Lobby
-                                room={this.props.room}
-                                call={this.state.call}
-                                conference={this.state.conference}
-                                ringbackPlayed={this.state.ringbackPlayed}
-                                ringbackDidPlay={this.ringbackDidPlay}
-                            />
-                        </Entity>
+                        <Lobby
+                            room={this.props.room}
+                            call={this.state.call}
+                            conference={this.state.conference}
+                            ringbackPlayed={this.state.ringbackPlayed}
+                            ringbackDidPlay={this.ringbackDidPlay}
+                        />
                     ) }
                     { this.props.room === 'tourismDemo' &&
                         <TourismScene />
@@ -248,7 +243,7 @@ VRScene.propTypes = {
 };
 
 function selectScene(scene, client) {
-    if ( scene === currentRoom) {
+    if (scene === currentRoom) {
         console.warn('Already in room %s, ignoring keypress', scene);
         return;
     }
