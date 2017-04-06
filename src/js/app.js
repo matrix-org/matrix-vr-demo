@@ -259,8 +259,13 @@ function selectScene(scene, client) {
         return;
     }
 
-    console.log(`Setting room to ${scene}`);
+    // Check that the VC is ready
+    if (scene === 'videoConf' && !confReady) {
+        console.warn("VC not ready. Not changing scene");
+        return;
+    }
 
+    console.log(`Setting room to ${scene}`);
     document.getElementById('main-scene').emit('scene-change');
     setTimeout(() => {
         ReactDOM.render(<VRScene room={scene} client={client} />, sceneContainer);
