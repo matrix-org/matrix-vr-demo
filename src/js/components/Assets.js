@@ -67,6 +67,9 @@ export default class Assets extends React.Component {
                     preload='auto'
                     crossOrigin></a-asset-item>
 
+                {/* Image textures */}
+                <img id="blocked" src="images/blocked.png"></img>
+
                 {/* Sounds */}
                 <audio id='blip1-sound'
                     src='https://matrix.org/vrdemo_resources/audio/blip1.mp3'
