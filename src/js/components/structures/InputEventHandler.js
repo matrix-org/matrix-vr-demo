@@ -30,9 +30,13 @@ export default class InputEventHandler {
         });
 
         window.addEventListener('keydown', (event) => {
-            // Handle keyCodes in Safari
-            const key = event.key || String.fromCharCode(event.keyCode).toLowerCase();
-            dispatcher.emit('keyEvent', key);
+            // Discard keypresses with modifier keys
+            if (!event.altKey && !event.ctlKey && !event.metaKey) {
+                const key = event.key || String.fromCharCode(event.keyCode).toLowerCase();
+                dispatcher.emit('keyEvent', key);
+            } else {
+                console.warn("Ignoring keypress with modifier");
+            }
         });
     }
 }
