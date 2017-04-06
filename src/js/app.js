@@ -42,6 +42,12 @@ const SCENE_TRANSITION_DURATION = 1000;
 const defaultRoom = 'lobby';
 let firstLoad = true;
 let currentRoom = defaultRoom;
+let confReady = false;
+
+window.setConfReady = function() {
+    console.warn("Conference ready");
+    confReady = true;
+};
 
 class VRScene extends React.Component {
     constructor(props) {
@@ -78,6 +84,8 @@ class VRScene extends React.Component {
             client: this.props.client,
             roomAlias: this.props.client.roomAlias,
         });
+
+        conference.on('ready', window.setConfReady);
 
         const newState = {
             call: call,
@@ -149,6 +157,9 @@ class VRScene extends React.Component {
     }
 
     componentWillUnmount() {
+        if (this.conference) {
+            this.conference.removeListener('ready', window.setConfReady);
+        }
         dispatcher.removeListener('keyEvent', this._onKeyEvent.bind(this));
         window.removeEventListener('hashchange', this._onHashChange);
     }
