@@ -64,7 +64,7 @@ export default class Playlist {
             if (video.currentTime > 0 && !video.paused && !video.ended) {
                 this.loadNext();
             } else {
-                video.addEventListener('play', this.loadNext);
+                video.addEventListener('play', () => this.loadNext);
             }
         } else {
             console.log('All playlist items loaded');
