@@ -276,8 +276,8 @@ export default class Lobby extends React.Component {
 
                     {/* VC UI */}
                     <Entity>
-                        {/* Hitbox */}
-                        {this.state.showPlaygroundGeometry && (
+                        {/* Hitbox -- Only show if conference is ready */}
+                        {this.state.showPlaygroundGeometry && this.props.conference && this.props.conference.roomId && (
                         <a-cylinder
                             color="crimson"
                             opacity="0"
@@ -299,6 +299,10 @@ export default class Lobby extends React.Component {
                                 id='box'
                                 src='#object-phonebox'
                                 position={this.phoneboxPosition}
+                                // Make phonebox translucent if conf is not ready
+                                material={{
+                                    opacity: (this.props.conference && this.props.conference.roomId) ? 1 : 0.5
+                                }}
                                 rotation='0 45 0'
                                 scale='0 0 0'>
 
