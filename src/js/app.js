@@ -38,8 +38,16 @@ import InputEventHandler from './components/structures/InputEventHandler';
 
 import Login from './components/views/Login';
 
-let firstLoad = true;
 const SCENE_TRANSITION_DURATION = 1000;
+const defaultRoom = 'lobby';
+let firstLoad = true;
+let currentRoom = defaultRoom;
+let confReady = false;
+
+window.setConfReady = function() {
+    console.warn('Conference ready');
+    confReady = true;
+};
 
 class VRScene extends React.Component {
     constructor(props) {
@@ -77,6 +85,8 @@ class VRScene extends React.Component {
             roomAlias: this.props.client.roomAlias,
         });
 
+        conference.on('ready', window.setConfReady);
+
         const newState = {
             call: call,
             conference: conference,
@@ -109,7 +119,7 @@ class VRScene extends React.Component {
     }
 
     _onSyncComplete() {
-        console.warn("Matrix client sync complete");
+        console.warn('Matrix client sync complete');
         this.setState({clientSynced: true});
     }
 
@@ -147,6 +157,9 @@ class VRScene extends React.Component {
     }
 
     componentWillUnmount() {
+        if (this.conference) {
+            this.conference.removeListener('ready', window.setConfReady);
+        }
         dispatcher.removeListener('keyEvent', this._onKeyEvent.bind(this));
         window.removeEventListener('hashchange', this._onHashChange);
     }
@@ -213,18 +226,13 @@ class VRScene extends React.Component {
                     />
 
                     { (this.props.room === 'lobby' || this.props.room === 'videoConf') && (
-                        <Entity>
-                            {/* No need to render the sky with the lobby model */}
-                            {this.props.room === 'videoConf' && (
-                            <a-sky color='#222222'></a-sky>)}
-                            <Lobby
-                                room={this.props.room}
-                                call={this.state.call}
-                                conference={this.state.conference}
-                                ringbackPlayed={this.state.ringbackPlayed}
-                                ringbackDidPlay={this.ringbackDidPlay}
-                            />
-                        </Entity>
+                        <Lobby
+                            room={this.props.room}
+                            call={this.state.call}
+                            conference={this.state.conference}
+                            ringbackPlayed={this.state.ringbackPlayed}
+                            ringbackDidPlay={this.ringbackDidPlay}
+                        />
                     ) }
                     { this.props.room === 'tourismDemo' &&
                         <TourismScene />
@@ -237,7 +245,7 @@ class VRScene extends React.Component {
 
 VRScene.defaultProps = {
     client: null,
-    room: 'lobby',
+    room: defaultRoom,
 };
 
 VRScene.propTypes = {
@@ -246,12 +254,23 @@ VRScene.propTypes = {
 };
 
 function selectScene(scene, client) {
-    console.log(`Setting room to ${scene}`);
+    if (scene === currentRoom) {
+        console.warn('Already in room %s, ignoring keypress', scene);
+        return;
+    }
 
+    // Check that the VC is ready
+    if (scene === 'videoConf' && !confReady) {
+        console.warn("VC not ready. Not changing scene");
+        return;
+    }
+
+    console.log(`Setting room to ${scene}`);
     document.getElementById('main-scene').emit('scene-change');
     setTimeout(() => {
         ReactDOM.render(<VRScene room={scene} client={client} />, sceneContainer);
     }, SCENE_TRANSITION_DURATION);
+    currentRoom = scene;
 }
 
 function switchScene(key, client) {

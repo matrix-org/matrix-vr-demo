@@ -219,11 +219,11 @@ export default class Lobby extends React.Component {
                         {/* Hitbox */}
                         {this.state.showPlaygroundGeometry && (
                         <a-cylinder
-                            color="crimson"
-                            opacity="0"
+                            color='crimson'
+                            opacity='0'
                             visible='false'
-                            height="3"
-                            radius="1"
+                            height='3'
+                            radius='1'
                             position={this.skisHighlightPosition}
                             interactive='opacity: 0; highlightOpacity: 0.35; highlightColor: crimson'
                             onClick={() => {dispatcher.emit('keyEvent', 't');}}>
@@ -276,8 +276,8 @@ export default class Lobby extends React.Component {
 
                     {/* VC UI */}
                     <Entity>
-                        {/* Hitbox */}
-                        {this.state.showPlaygroundGeometry && (
+                        {/* Hitbox -- Only show if conference is ready */}
+                        {this.state.showPlaygroundGeometry && this.props.conference && this.props.conference.roomId && (
                         <a-cylinder
                             color="crimson"
                             opacity="0"
@@ -301,7 +301,12 @@ export default class Lobby extends React.Component {
                                 position={this.phoneboxPosition}
                                 rotation='0 45 0'
                                 scale='0 0 0'>
-
+                            {/* Conference not ready sign */}
+                            {(!this.props.conference || !this.props.conference.roomId) && (<a-entity
+                                position='0 1.5 1'
+                                geometry='primitive: plane; height: 1; width: 1'
+                                material='side: double; src: #blocked; transparent: true; opacity: 0.8'
+                            ></a-entity>)}
                             {/*  Animate phonebox in */}
                             <a-animation
                                 id='transitionBoxGrowDepth'

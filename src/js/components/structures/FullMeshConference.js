@@ -73,6 +73,7 @@ export default class FullMeshConference extends EventEmitter {
                 }
                 console.warn('Joined conference room');
                 this.roomId = room.roomId;
+                this.emit('ready', this.roomId);
             }).catch((e) => console.error(`ERROR: ${e.message}`, e));
         };
         if (this.client.synced) {
