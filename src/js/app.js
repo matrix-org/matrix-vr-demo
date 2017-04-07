@@ -45,7 +45,7 @@ let currentRoom = defaultRoom;
 let confReady = false;
 
 window.setConfReady = function() {
-    console.warn("Conference ready");
+    console.warn('Conference ready');
     confReady = true;
 };
 
@@ -119,7 +119,7 @@ class VRScene extends React.Component {
     }
 
     _onSyncComplete() {
-        console.warn("Matrix client sync complete");
+        console.warn('Matrix client sync complete');
         this.setState({clientSynced: true});
     }
 
