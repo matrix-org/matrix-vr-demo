@@ -35,7 +35,7 @@ export default class InputEventHandler {
                 const key = event.key || String.fromCharCode(event.keyCode).toLowerCase();
                 dispatcher.emit('keyEvent', key);
             } else {
-                console.warn("Ignoring keypress with modifier");
+                console.warn('Ignoring keypress with modifier');
             }
         });
     }

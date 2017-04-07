@@ -68,7 +68,7 @@ export default class Assets extends React.Component {
                     crossOrigin></a-asset-item>
 
                 {/* Image textures */}
-                <img id="blocked" src="images/blocked.png"></img>
+                <img id='blocked' src='images/blocked.png'></img>
 
                 {/* Sounds */}
                 <audio id='blip1-sound'
