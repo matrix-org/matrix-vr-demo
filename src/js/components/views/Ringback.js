@@ -18,6 +18,7 @@ limitations under the License.
 import React from 'react';
 import {Entity} from 'aframe-react';
 import Call from '../structures/Call';
+import Playlist from '../structures/Playlist';
 import {default as dispatcher} from '../../common/dispatcher';
 import 'aframe-look-at-component';
 
@@ -40,6 +41,16 @@ export default class Ringback extends React.Component {
         this.showRingbackTimeout = null;
         this.showVideoTimeout = null;
         this.playVideoTimeout = null;
+
+        this.playlist = new Playlist({
+            playlistId: 'ringback',
+            items: [
+                {
+                    id: 'ringback-welcome',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/Welcome%20to%20the%20Matrix.mp4',
+                },
+            ],
+        });
     }
 
     componentDidMount() {
@@ -72,6 +83,9 @@ export default class Ringback extends React.Component {
         if (this.showRingbackTimeout) clearTimeout(this.showRingbackTimeout);
         if (this.showVideoTimeout) clearTimeout(this.showVideoTimeout);
         if (this.playVideoTimeout) clearTimeout(this.playVideoTimeout);
+
+        // Clean up an unused / incomplete playlist resources
+        this.playlist.cleanup();
 
         // Callback to parent when component will unmount
         if (this.props.ringbackDidUnmount && typeof this.props.ringbackDidUnmount === 'function') {
@@ -224,7 +238,7 @@ export default class Ringback extends React.Component {
     render() {
         return (
             <Entity
-                rotation={this.props.rotation}>
+            rotation={this.props.rotation}>
                 {this.videos[this.state.videoIndex] && (
                 <a-plane
                     id='videoPlane'
