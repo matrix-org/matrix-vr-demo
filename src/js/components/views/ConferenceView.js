@@ -128,7 +128,8 @@ export default class ConferenceView extends React.Component {
                         radius={this.props.radius}
                         position={[0, PLANE_HEIGHT_FROM_GROUND - 0.75, 0].join(' ')}
                         rotation='-90 0 0'
-                        color='#444'></a-circle>
+                        color='#444'
+                        opacity='0.75'></a-circle>
                 }
             </Entity>
         );
