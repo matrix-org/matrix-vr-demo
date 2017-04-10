@@ -91,10 +91,14 @@ export default class Lobby extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        if ((this.props.room !== nextProps.room) && this.state.showPlaygroundGeometry) {
+            this.setState({showPlaygroundGeometry: false});
+        }
+    }
+
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.room !== 'lobby' && this.props.room === 'lobby') {
-            this.setState({showPlaygroundGeometry: false});
-
             // Navigation UI toggle
             this.refs['navigationSphere'].removeEventListener('click', this.navigateToLobby);
             this.refs['navigationSphere'].addEventListener('click', this.togglePlaygroundGeometry);
