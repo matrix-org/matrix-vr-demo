@@ -66,7 +66,7 @@ export default class ConferenceView extends React.Component {
         const calls = this.state.calls.filter((call) => call.active);
         let callViews = [];
         if (calls.length) {
-            let modRemainder = calls.length;
+            let modRemainder = calls.length + 1;
             callViews = calls.map((call, index) => {
                 if (index && index % ROW_LENGTH === 0) {
                     modRemainder -= ROW_LENGTH;
