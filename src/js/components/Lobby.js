@@ -187,6 +187,7 @@ export default class Lobby extends React.Component {
                         ringbackDidHide={this.ringbackDidHide}
                         ringbackPlayed={this.props.ringbackPlayed}
                         ringbackDidPlay={this.props.ringbackDidPlay}
+                        loopRingback={true}
                     />
                 )}
 

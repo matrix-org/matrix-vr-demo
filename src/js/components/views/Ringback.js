@@ -160,7 +160,11 @@ export default class Ringback extends React.Component {
             this.videos[this.state.videoIndex].pause();
         }
         this.videos[this.state.videoIndex].removeEventListener('ended', this.playNextVideo);
-        const videoIndex = this.state.videoIndex + 1;
+        let videoIndex = this.state.videoIndex + 1;
+
+        if (videoIndex >= this.videos.length && this.props.loopRingback) {
+            videoIndex = 0;
+        }
 
         if (videoIndex < this.videos.length) {
             this.setState({
@@ -316,4 +320,5 @@ Ringback.propTypes = {
     ringbackDidHide: React.PropTypes.func,
     ringbackPlayed: React.PropTypes.bool,
     ringbackDidPlay: React.PropTypes.func,
+    loopRingback: React.PropTypes.bool,
 };
