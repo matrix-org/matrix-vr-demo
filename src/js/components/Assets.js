@@ -103,18 +103,10 @@ export default class Assets extends React.Component {
 
                 {/* Tourism scene video playlist */}
                 <span id='tourism'>
-                    <video id='ski-video1'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski1.mp4'
-                        muted crossOrigin></video>
-                    <video id='ski-video2'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski2.mp4'
-                        muted crossOrigin></video>
-                    <video id='ski-video3'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski3.mp4'
-                        muted crossOrigin></video>
-                    <video id='ski-video4'
-                        src='https://matrix.org/vrdemo_resources/video/360/ski4.mp4'
-                        muted crossOrigin></video>
+                    <video id='ski-video1' muted crossOrigin></video>
+                    <video id='ski-video2' muted crossOrigin></video>
+                    <video id='ski-video3' muted crossOrigin></video>
+                    <video id='ski-video4' muted crossOrigin></video>
                     <a-mixin id='ski-video1-mixin' rotation='-5 -90 30' />
                     <a-mixin id='ski-video2-mixin' rotation='-10 -90 15' />
                     <a-mixin id='ski-video3-mixin' rotation='0 -90 30' />
