@@ -21,29 +21,18 @@ import CallView from './CallView';
 import FullMeshConference from '../structures/FullMeshConference';
 
 const PLANE_WIDTH = 1;
+const PLANE_HEIGHT = PLANE_WIDTH * 0.9 / 1.6;
 const PLANE_SPACING = PLANE_WIDTH * 0.2;
 const PLANE_HEIGHT_FROM_GROUND = PLANE_WIDTH / 2;
+const ROW_LENGTH = 3;
 
-function radiansToDegrees(angle) {
-    return angle * 180 / Math.PI;
-}
-
-function indexToAngleAndScale(n, index, fov, radius, scaleThreshold) {
+function indexToAngle(n, index, fov, radius) {
     const offset = index - Math.floor((n - 1) / 2);
-    const tableArcLength = radius * radiansToDegrees(fov);
+    const tableArcLength = radius * fov * Math.PI / 180.0;
     const arcLength = offset * (PLANE_WIDTH + PLANE_SPACING) - (n % 2 === 0
         ? ((PLANE_WIDTH + PLANE_SPACING) / 2)
         : 0);
-    const angle = radiansToDegrees(fov) * arcLength / tableArcLength;
-    let scale = tableArcLength / ((n * PLANE_WIDTH) + ((n - 1) * PLANE_SPACING));
-    if (scale > scaleThreshold) {
-        scale = scaleThreshold;
-    }
-
-    return {
-        angle: -radiansToDegrees(angle * scale),
-        scale,
-    };
+    return fov * arcLength / tableArcLength;
 }
 
 export default class ConferenceView extends React.Component {
@@ -77,9 +66,15 @@ export default class ConferenceView extends React.Component {
         const calls = this.state.calls.filter((call) => call.active);
         let callViews = [];
         if (calls.length) {
+            let modRemainder = calls.length + 1;
             callViews = calls.map((call, index) => {
-                const {angle, scale} = indexToAngleAndScale(calls.length + 1, index,
-                    this.props.fov, this.props.radius, this.props.scaleThreshold);
+                if (index && index % ROW_LENGTH === 0) {
+                    modRemainder -= ROW_LENGTH;
+                }
+                const angle = indexToAngle(
+                    modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
+                    index % ROW_LENGTH, this.props.fov, this.props.radius,
+                );
                 const localpart = call.peerId.match(/@([a-zA-Z0-9_-]+):.*/)[1];
                 let peerName;
                 if (localpart.match(/^mxvr[0-9]+$/)) {
@@ -92,33 +87,45 @@ export default class ConferenceView extends React.Component {
                     peerName = localpart;
                 }
 
+                const planeYPos = PLANE_HEIGHT_FROM_GROUND +
+                    Math.floor(index / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
                 return (
                     <CallView
                         key={call.id}
                         call={call}
-                        width={scale * PLANE_WIDTH}
-                        height={scale * PLANE_WIDTH * 0.9 / 1.6}
-                        position={[0, PLANE_HEIGHT_FROM_GROUND, -this.props.radius]}
+                        width={PLANE_WIDTH}
+                        height={PLANE_HEIGHT}
+                        position={[0, planeYPos, -this.props.radius]}
                         rotation={[0, angle, 0]}
                         faceCamera={false}
                         text={peerName} />
                 );
             });
 
-            const {angle, scale} = indexToAngleAndScale(calls.length + 1, calls.length,
-                this.props.fov, this.props.radius, this.props.scaleThreshold);
+
+            if (calls.length % ROW_LENGTH === 0) {
+                modRemainder -= ROW_LENGTH;
+            }
+            const angle = indexToAngle(
+                modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
+                calls.length % ROW_LENGTH, this.props.fov, this.props.radius,
+            );
+            const planeYPos = PLANE_HEIGHT_FROM_GROUND +
+                Math.floor(calls.length / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
             callViews.push(<CallView
                 key={`local-${calls[0].id}`}
                 showLocal={true}
                 call={calls[0]}
-                width={scale * PLANE_WIDTH}
-                height={scale * PLANE_WIDTH * 0.9 / 1.6}
-                position={[0, PLANE_HEIGHT_FROM_GROUND, -this.props.radius]}
+                width={PLANE_WIDTH}
+                height={PLANE_HEIGHT}
+                position={[0, planeYPos, -this.props.radius]}
                 rotation={[0, angle, 0]}
                 faceCamera={false}
                 text='You' />);
         }
         console.warn('Rendering ConferenceView');
+
+        const tableYPos = PLANE_HEIGHT_FROM_GROUND - (PLANE_SPACING + 0.5 * PLANE_HEIGHT);
 
         return (
             <Entity position={this.props.position}>
@@ -126,9 +133,20 @@ export default class ConferenceView extends React.Component {
                 {this.props.showTable &&
                     <a-circle
                         radius={this.props.radius}
-                        position={[0, PLANE_HEIGHT_FROM_GROUND - 0.75, 0].join(' ')}
+                        position={[0, tableYPos, 0].join(' ')}
                         rotation='-90 0 0'
-                        color='#444'></a-circle>
+                        color='#444'
+                        opacity='0.75'>
+                        {this.props.conference.roomAlias &&
+                                this.props.conference.roomAlias.length > 0 &&
+                            <a-text
+                                value={this.props.conference.roomAlias}
+                                width={this.props.radius}
+                                position={[0, 0.56 * this.props.radius, 0].join(' ')}
+                                color='#ffffff'
+                                align='center'></a-text>
+                        }
+                    </a-circle>
                 }
             </Entity>
         );
