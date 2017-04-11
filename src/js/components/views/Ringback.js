@@ -180,7 +180,8 @@ export default class Ringback extends React.Component {
         }, this.hideAnimationLength);
         let videoIndex = this.state.videoIndex + 1;
 
-        if (videoIndex >= this.videos.length && this.props.loopRingback) {
+        if (this.props.loopRingback &&
+                (videoIndex >= this.videos.length || !this.props.call)) {
             videoIndex = 0;
         }
 
