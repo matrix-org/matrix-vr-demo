@@ -136,7 +136,17 @@ export default class ConferenceView extends React.Component {
                         position={[0, tableYPos, 0].join(' ')}
                         rotation='-90 0 0'
                         color='#444'
-                        opacity='0.75'></a-circle>
+                        opacity='0.75'>
+                        {this.props.conference.roomAlias &&
+                                this.props.conference.roomAlias.length > 0 &&
+                            <a-text
+                                value={this.props.conference.roomAlias}
+                                width={this.props.radius}
+                                position={[0, 0.56 * this.props.radius, 0].join(' ')}
+                                color='#ffffff'
+                                align='center'></a-text>
+                        }
+                    </a-circle>
                 }
             </Entity>
         );
