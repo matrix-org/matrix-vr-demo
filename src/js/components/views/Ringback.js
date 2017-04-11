@@ -33,6 +33,8 @@ export default class Ringback extends React.Component {
         this.stopRingback = this.stopRingback.bind(this);
         this.ringbackHidden = this.ringbackHidden.bind(this);
         this.playNextVideo = this.playNextVideo.bind(this);
+        this.playVideo = this.playVideo.bind(this);
+        this.queueVideo = this.queueVideo.bind(this);
         this._onKeyEvent = this._onKeyEvent.bind(this);
         this.videos = [];
         this.showAnimationLength = 1500;
@@ -48,6 +50,18 @@ export default class Ringback extends React.Component {
                 {
                     id: 'ringback-welcome',
                     src: 'https://matrix.org/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4',
+                },
+                {
+                    id: 'ringback-you-are-being',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/You_Are_Being.mp4',
+                },
+                {
+                    id: 'ringback-still-waiting',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/Still_Waiting.mp4',
+                },
+                {
+                    id: 'ringback-please-wait',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/Please_Wait.mp4',
                 },
             ],
         });
@@ -122,7 +136,7 @@ export default class Ringback extends React.Component {
             this.playVideoTimeout = setTimeout(() => {
                 this.playVideoTimeout = null;
                 console.warn('Starting ringback video');
-                this.playVideo();
+                this.playVideo(0);
 
                 if (this.props.ringbackDidPlay) {
                     this.props.ringbackDidPlay();
@@ -170,35 +184,39 @@ export default class Ringback extends React.Component {
             videoIndex = 0;
         }
 
-        if (videoIndex < this.videos.length) {
-            this.setState({
-                videoIndex: videoIndex,
-            });
-            this.videos[videoIndex].addEventListener('ended', this.playNextVideo);
 
+        if (videoIndex < this.videos.length) {
             const delayMixin = document.getElementById(this.videos[videoIndex].id + '-mixin');
             let delayStart = 0;
             if (delayMixin && delayMixin.getAttribute('delay')) {
                 delayStart = Number(delayMixin.getAttribute('delay'));
+            } else if (videoIndex === 0) {
+                delayStart = this.props.startDelay;
             }
 
             if (delayStart > 0) {
-                this.queueVideo(delayStart);
+                this.queueVideo(delayStart, videoIndex);
             } else {
-                this.playVideo();
+                this.playVideo(videoIndex);
             }
         } else {
             this.stopRingback();
         }
     }
 
-    playVideo() {
-        console.warn('Playing video ' + this.videos[this.state.videoIndex].id);
+    playVideo(videoIndex) {
+        console.warn('Playing video ' + this.videos[videoIndex].id);
+
+        this.setState({
+            videoIndex: videoIndex,
+        });
+        this.videos[videoIndex].addEventListener('ended', this.playNextVideo);
+
         this.playVideoTimeout = null;
 
         // Ensure that current mute status is preserved
-        this.videos[this.state.videoIndex].muted = this.state.muted;
-        this.videos[this.state.videoIndex].play();
+        this.videos[videoIndex].muted = this.state.muted;
+        this.videos[videoIndex].play();
     }
 
     toggleMute() {
@@ -226,19 +244,29 @@ export default class Ringback extends React.Component {
         this.videos[this.state.videoIndex].pause();
     }
 
-    queueVideo(delay) {
+    queueVideo(delay, videoIndex) {
         console.warn('Waiting %d before playing next video', delay);
         if (delay > this.hideAnimationLength + this.showAnimationLength) {
             this.refs.videoPlane.emit('hideRingback');
             this.showRingbackTimeout = setTimeout(() => {
+                this.setState({
+                    videoIndex: videoIndex,
+                });
+                this.videos[videoIndex].addEventListener('ended', this.playNextVideo);
+
                 this.showRingbackTimeout = null;
                 this.refs.videoPlane.emit('showRingback');
             }, delay - (this.hideAnimationLength + this.showAnimationLength));
-            this.playVideoTimeout = setTimeout(this.playVideo.bind(this), delay);
+            this.playVideoTimeout = setTimeout(() => this.playVideo(videoIndex), delay);
         } else {
-            this.playVideoTimeout = setTimeout(function() {
-                this.playVideo();
-            }.bind(this), delay);
+            this.playVideoTimeout = setTimeout(() => {
+                this.setState({
+                    videoIndex: videoIndex,
+                });
+                this.videos[videoIndex].addEventListener('ended', this.playNextVideo);
+
+                this.playVideo(videoIndex);
+            }, delay);
         }
     }
 
