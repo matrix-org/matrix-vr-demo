@@ -114,6 +114,9 @@ export default class Assets extends React.Component {
 
                 {/* Ringback video playlist */}
                 <span id='ringback'>
+                    <a-mixin id='ringback-you-are-being-mixin' delay='5000' />
+                    <a-mixin id='ringback-still-waiting-mixin' delay='5000' />
+                    <a-mixin id='ringback-please-wait-mixin' delay='5000' />
                 </span>
 
             </a-assets>
