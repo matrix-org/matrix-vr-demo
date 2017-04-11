@@ -207,6 +207,7 @@ export default class Lobby extends React.Component {
                         conference={this.props.conference}
                         position={[0, 1, 0]}
                         fov={120}
+                        radius={1.5}
                         scaleThreshold={2}
                         showTable={true}
                     />
