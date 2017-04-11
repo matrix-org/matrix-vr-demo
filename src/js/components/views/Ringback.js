@@ -160,6 +160,10 @@ export default class Ringback extends React.Component {
             this.videos[this.state.videoIndex].pause();
         }
         this.videos[this.state.videoIndex].removeEventListener('ended', this.playNextVideo);
+        const prevVideoIndex = this.state.videoIndex;
+        setTimeout(() => {
+            this.videos[prevVideoIndex].currentTime = 0;
+        }, this.hideAnimationLength);
         let videoIndex = this.state.videoIndex + 1;
 
         if (videoIndex >= this.videos.length && this.props.loopRingback) {
@@ -191,7 +195,6 @@ export default class Ringback extends React.Component {
     playVideo() {
         console.warn('Playing video ' + this.videos[this.state.videoIndex].id);
         this.playVideoTimeout = null;
-        this.videos[this.state.videoIndex].currentTime = 0;
 
         // Ensure that current mute status is preserved
         this.videos[this.state.videoIndex].muted = this.state.muted;
