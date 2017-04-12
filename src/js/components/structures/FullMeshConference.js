@@ -162,12 +162,22 @@ export default class FullMeshConference extends EventEmitter {
                 this._updatePeersToCall();
             }
             const members = this.client.getJoinedMembers(matrixCall.roomId);
-            if (members.length === 1 &&
-                    (!this.roomId || this.peersToCall.has(members[0]))) {
-                if (this.active && this.roomId) {
-                    // auto-answer when called
-                    console.warn(`${members[0]} CALLED ${this.client.userId}`);
-                    this._callNewPeer(members[0], matrixCall);
+            if (members.length === 1) {
+                if (this.roomId && this.active) {
+                    if (this.calledPeers.has(members[0])) {
+                        // hang up the existing call and respond to the new call as
+                        // it's likely the peer user re-dialled
+                        const oldCall = this.calledPeers.get(members[0]);
+                        this._hangUpPeer(members[0], oldCall);
+                        // note that the peer is added to the peersToCall so that the
+                        // call will be answered in the next if block
+                        this.peersToCall.add(members[0]);
+                    }
+                    if (this.peersToCall.has(members[0])) {
+                        // auto-answer when called
+                        console.warn(`${members[0]} CALLED ${this.client.userId}`);
+                        this._callNewPeer(members[0], matrixCall);
+                    }
                 } else {
                     matrixCall.peerId = members[0];
                     this.callsPendingAnswer.set(members[0], matrixCall);
