@@ -165,10 +165,22 @@ class VRScene extends React.Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (this.state.call && this.state.conference) {
+        if (this.state.call) {
             if (this.props.room !== 'videoConf' && nextProps.room === 'videoConf') {
                 console.warn('Stopping video call');
                 this.state.call.hangUp();
+            } else if (this.props.room === 'videoConf' &&
+                    nextProps.room !== 'videoConf') {
+                console.warn('Starting video call');
+                this.state.call.callPeer();
+            }
+        } else if (nextState.call && nextProps.room !== 'videoConf') {
+            console.warn('Starting video call');
+            nextState.call.callPeer();
+        }
+
+        if (this.state.conference) {
+            if (this.props.room !== 'videoConf' && nextProps.room === 'videoConf') {
                 console.warn('Starting video conference');
                 this.state.conference.start();
                 this.state.conference.callPeers();
@@ -177,18 +189,11 @@ class VRScene extends React.Component {
                 console.warn('Stopping video conference');
                 this.state.conference.hangUp();
                 this.state.conference.stop();
-                console.warn('Starting video call');
-                this.state.call.callPeer();
             }
-        } else {
-            if (nextState.call && nextProps.room !== 'videoConf') {
-                console.warn('Starting video call');
-                nextState.call.callPeer();
-            } else if (nextState.conference && nextProps.room === 'videoConf') {
-                console.warn('Starting video conference');
-                this.state.conference.start();
-                nextState.conference.callPeers();
-            }
+        } else if (nextState.conference && nextProps.room === 'videoConf') {
+            console.warn('Starting video conference');
+            this.state.conference.start();
+            nextState.conference.callPeers();
         }
     }
 
