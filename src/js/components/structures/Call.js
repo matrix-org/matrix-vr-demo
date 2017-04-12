@@ -50,12 +50,14 @@ export default class Call extends EventEmitter {
 
         this._addListeners = this._addListeners.bind(this);
         this._callPeer = this._callPeer.bind(this);
+        this._cleanUp = this._cleanUp.bind(this);
         this._constructFromMatrixCall = this._constructFromMatrixCall.bind(this);
         this._onError = this._onError.bind(this);
         this._onHangup = this._onHangup.bind(this);
         this._onLoadedMetadata = this._onLoadedMetadata.bind(this);
         this._onUserJoined = this._onUserJoined.bind(this);
         this._prepareCall = this._prepareCall.bind(this);
+        this._removeListeners = this._removeListeners.bind(this);
 
         this.answer = this.answer.bind(this);
         this.callPeer = this.callPeer.bind(this);
