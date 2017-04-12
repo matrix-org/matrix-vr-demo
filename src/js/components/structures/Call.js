@@ -75,12 +75,6 @@ export default class Call extends EventEmitter {
     }
 
     _cleanUp() {
-        if (this.localVideo.parentElement) {
-            this.localVideo.parentElement.removeChild(this.localVideo);
-        }
-        if (this.remoteVideo.parentElement) {
-            this.remoteVideo.parentElement.removeChild(this.remoteVideo);
-        }
         this.call.removeListener('hangup', this._onHangup);
         this.call.removeListener('error', this._onError);
         this.client.removeListener('syncComplete', this._prepareCall);

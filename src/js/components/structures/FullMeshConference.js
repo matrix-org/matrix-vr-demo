@@ -118,7 +118,7 @@ export default class FullMeshConference extends EventEmitter {
         this.emit('participantsChanged', peer);
         call.removeListener('callActive', this._onCallActive);
         call.removeListener('hungUp', this._onCallHungUp);
-        // call._cleanUp();
+        call._cleanUp();
         this.calledPeers.delete(peer);
     }
 
@@ -197,7 +197,7 @@ export default class FullMeshConference extends EventEmitter {
         const call = this.calledPeers.get(peerId);
         call.removeListener('callActive', this._onCallActive);
         call.removeListener('hungUp', this._onCallHungUp);
-        // call._cleanUp();
+        call._cleanUp();
         this.calledPeers.delete(peerId);
         this.peersToCall.add(peerId);
         this.emit('participantsChanged', peerId);
