@@ -188,7 +188,6 @@ export default class Call extends EventEmitter {
             console.log(`Hanging up on ${this.peerId}`);
             this.call.hangup();
             this.active = false;
-            this.emit('hungUp', this.peerId);
         }
     }
 }
