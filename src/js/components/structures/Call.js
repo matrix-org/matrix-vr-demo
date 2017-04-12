@@ -90,6 +90,7 @@ export default class Call extends EventEmitter {
         console.warn(this.client.userId + ': Hang up.' +
             (this._lastError ? ' Last error: ' + this._lastError : ''));
         this.emit('hungUp', this.peerId);
+        this._removeListeners();
     }
 
     _onError(err) {
@@ -101,6 +102,11 @@ export default class Call extends EventEmitter {
     _addListeners() {
         this.call.on('hangup', this._onHangup);
         this.call.on('error', this._onError);
+    }
+
+    _removeListeners() {
+        this.call.removeListener('hangup', this._onHangup);
+        this.call.removeListener('error', this._onError);
     }
 
     _constructFromMatrixCall(matrixCall) {
