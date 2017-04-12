@@ -267,6 +267,11 @@ export default class Login extends React.Component {
             }
         }
 
+        console.warn('user name:\t' + formData.username);
+        console.warn('home server:\t' + formData.homeserver);
+        console.warn('1:1 guide ID:\t' + (formData.peerId || 'not set'));
+        console.warn('room alias:\t' + (formData.roomAlias || 'not set'));
+
         this.props.onSubmit(formData);
 
         return true;
