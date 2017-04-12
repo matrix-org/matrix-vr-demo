@@ -82,8 +82,10 @@ export default class Call extends EventEmitter {
     }
 
     _cleanUp() {
-        this.call.removeListener('hangup', this._onHangup);
-        this.call.removeListener('error', this._onError);
+        if (this.call) {
+            this.call.removeListener('hangup', this._onHangup);
+            this.call.removeListener('error', this._onError);
+        }
         this.client.removeListener('syncComplete', this._prepareCall);
         this.client.removeListener('userJoined', this._onUserJoined);
     }
