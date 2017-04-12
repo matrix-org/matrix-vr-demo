@@ -43,12 +43,6 @@ export default class Call extends EventEmitter {
         if (!this.remoteVideo.parentElement) {
             this.parentElement.appendChild(this.remoteVideo);
         }
-        const onLoadedMetadata = (e) => {
-            this.active = true;
-            console.warn(`Call to ${this.peerId} is now active`);
-            this.emit('callActive', this.peerId);
-        };
-        this.remoteVideo.addEventListener('loadedmetadata', onLoadedMetadata);
         this.active = this.remoteVideo.videoWidth > 0;
         if (this.active) {
             this.emit('callActive');
@@ -59,6 +53,7 @@ export default class Call extends EventEmitter {
         this._constructFromMatrixCall = this._constructFromMatrixCall.bind(this);
         this._onError = this._onError.bind(this);
         this._onHangup = this._onHangup.bind(this);
+        this._onLoadedMetadata = this._onLoadedMetadata.bind(this);
         this._onUserJoined = this._onUserJoined.bind(this);
         this._prepareCall = this._prepareCall.bind(this);
 
@@ -71,6 +66,12 @@ export default class Call extends EventEmitter {
         if (options.matrixCall) {
             this._constructFromMatrixCall(options.matrixCall);
         }
+    }
+
+    _onLoadedMetadata(e) {
+        this.active = true;
+        console.warn(`Call to ${this.peerId} is now active`);
+        this.emit('callActive', this.peerId);
     }
 
     _cleanUp() {
@@ -100,11 +101,13 @@ export default class Call extends EventEmitter {
     }
 
     _addListeners() {
+        this.remoteVideo.addEventListener('loadedmetadata', this._onLoadedMetadata);
         this.call.on('hangup', this._onHangup);
         this.call.on('error', this._onError);
     }
 
     _removeListeners() {
+        this.remoteVideo.removeEventListener('loadedmetadata', this._onLoadedMetadata);
         this.call.removeListener('hangup', this._onHangup);
         this.call.removeListener('error', this._onError);
     }
