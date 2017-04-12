@@ -38,6 +38,7 @@ export default class FullMeshConference extends EventEmitter {
         this.calledPeers = new Map();
         this.callsPendingAnswer = new Map();
 
+        this._debugLog = this._debugLog.bind(this);
         this._callNewPeer = this._callNewPeer.bind(this);
         this._hangUpPeer = this._hangUpPeer.bind(this);
         this._addClientListeners = this._addClientListeners.bind(this);
@@ -54,7 +55,7 @@ export default class FullMeshConference extends EventEmitter {
         const preparePeers = () => {
             this.client.removeListener('syncComplete', preparePeers);
             this._addClientListeners();
-            console.warn(`Joining conference room ${this.roomAlias}`);
+            this._debugLog(`Joining conference room ${this.roomAlias}`);
             this.client.joinRoomWithAlias(this.roomAlias, {
                 visibility: 'private', // not listed
                 preset: 'public_chat', // join without invite, history has shared visibility
@@ -71,7 +72,7 @@ export default class FullMeshConference extends EventEmitter {
                         `attempted.)\nRefresh and try a room with fewer members.`);
                     return;
                 }
-                console.warn('Joined conference room');
+                this._debugLog('Joined conference room');
                 this.roomId = room.roomId;
                 this.emit('ready', this.roomId);
             }).catch((e) => console.error(`ERROR: ${e.message}`, e));
@@ -81,6 +82,10 @@ export default class FullMeshConference extends EventEmitter {
         } else {
             this.client.on('syncComplete', preparePeers);
         }
+    }
+
+    _debugLog(...args) {
+        console.warn(`FullMeshConference ${this.roomAlias}: ${this.roomId}:`, ...args);
     }
 
     _updatePeersToCall() {
@@ -114,7 +119,7 @@ export default class FullMeshConference extends EventEmitter {
 
     _hangUpPeer(peer, call) {
         call.hangUp();
-        console.warn('Emitting HANG UP');
+        this._debugLog('Emitting HANG UP');
         this.emit('participantsChanged', peer);
         call.removeListener('callActive', this._onCallActive);
         call.removeListener('hungUp', this._onCallHungUp);
@@ -175,7 +180,7 @@ export default class FullMeshConference extends EventEmitter {
                     }
                     if (this.peersToCall.has(members[0])) {
                         // auto-answer when called
-                        console.warn(`${members[0]} CALLED ${this.client.userId}`);
+                        this._debugLog(`${members[0]} CALLED ${this.client.userId}`);
                         this._callNewPeer(members[0], matrixCall);
                     }
                 } else {
@@ -188,12 +193,12 @@ export default class FullMeshConference extends EventEmitter {
     }
 
     _onCallActive(peerId) {
-        console.warn(`participantsChanged: ${peerId} joined`);
+        this._debugLog(`participantsChanged: ${peerId} joined`);
         this.emit('participantsChanged', peerId);
     }
 
     _onCallHungUp(peerId) {
-        console.warn(`participantsChanged: ${peerId} left`);
+        this._debugLog(`participantsChanged: ${peerId} left`);
         const call = this.calledPeers.get(peerId);
         call.removeListener('callActive', this._onCallActive);
         call.removeListener('hungUp', this._onCallHungUp);
@@ -256,7 +261,7 @@ export default class FullMeshConference extends EventEmitter {
             this.client.removeListener('syncComplete', doIt);
             this._updatePeersToCall();
             this.peersToCall.forEach((peer) => {
-                console.warn(`${this.client.userId} MAKING CALL TO ${peer}`);
+                this._debugLog(`${this.client.userId} MAKING CALL TO ${peer}`);
                 this._callNewPeer(peer);
             });
         };

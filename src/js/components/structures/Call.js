@@ -52,6 +52,7 @@ export default class Call extends EventEmitter {
         this._callPeer = this._callPeer.bind(this);
         this._cleanUp = this._cleanUp.bind(this);
         this._constructFromMatrixCall = this._constructFromMatrixCall.bind(this);
+        this._debugLog = this._debugLog.bind(this);
         this._onError = this._onError.bind(this);
         this._onHangup = this._onHangup.bind(this);
         this._onLoadedMetadata = this._onLoadedMetadata.bind(this);
@@ -70,9 +71,13 @@ export default class Call extends EventEmitter {
         }
     }
 
+    _debugLog(...args) {
+        console.warn(`Call ${this.id}: ${this.call && this.call.callId}:`, ...args);
+    }
+
     _onLoadedMetadata(e) {
         this.active = true;
-        console.warn(`Call to ${this.peerId} is now active`);
+        this._debugLog(`Call to ${this.peerId} is now active`);
         this.emit('callActive', this.peerId);
     }
 
@@ -84,7 +89,7 @@ export default class Call extends EventEmitter {
     }
 
     _onHangup() {
-        console.warn(this.client.userId + ': Hang up.' +
+        this._debugLog(this.client.userId + ': Hang up.' +
             (this._lastError ? ' Last error: ' + this._lastError : ''));
         this.emit('hungUp', this.peerId);
         this._removeListeners();
@@ -92,7 +97,7 @@ export default class Call extends EventEmitter {
 
     _onError(err) {
         this._lastError = err.message;
-        console.warn(`ERROR: ${err.message}\n${err.stack}`);
+        this._debugLog(`ERROR: ${err.message}\n${err.stack}`);
         this.call.hangup();
     }
 
@@ -117,7 +122,7 @@ export default class Call extends EventEmitter {
 
     _callPeer(peer) {
         this.call = this.client.createCall(peer.roomId);
-        console.warn(`${this.client.userId} CALLING ${peer.userId}`);
+        this._debugLog(`${this.client.userId} CALLING ${peer.userId}`);
         this._addListeners();
         this.call.placeVideoCall(this.remoteVideo, this.localVideo);
     }
@@ -156,9 +161,9 @@ export default class Call extends EventEmitter {
             invite: [this.peerId],
             name: CALL_ROOM_NAME,
         }).then(({roomId}) => {
-            console.warn(`${this.client.userId} created room ${roomId}`
+            this._debugLog(`${this.client.userId} created room ${roomId}`
                 + ` and invited ${this.peerId}`);
-        }).catch((e) => console.warn(this.client.userId + ': ERROR: '
+        }).catch((e) => this._debugLog(this.client.userId + ': ERROR: '
             + e.message + '\n' + e.stack));
     }
 
