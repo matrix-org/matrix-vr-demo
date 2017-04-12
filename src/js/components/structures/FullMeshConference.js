@@ -125,6 +125,7 @@ export default class FullMeshConference extends EventEmitter {
     _getOrRemovePendingCall(call) {
         // NOTE: re-assigning call from the Map below so we can use this function
         // with the call argument as {peerId}
+        // NOTE: call is a MatrixCall
         call = this.callsPendingAnswer.get(call.peerId);
         call.removeListener('hangup', this._getOrRemovePendingCall);
         this.callsPendingAnswer.delete(call.peerId);
