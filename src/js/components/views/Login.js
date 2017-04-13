@@ -267,6 +267,11 @@ export default class Login extends React.Component {
             }
         }
 
+        console.warn('user name:\t' + formData.username);
+        console.warn('home server:\t' + formData.homeserver);
+        console.warn('1:1 guide ID:\t' + (formData.peerId || 'not set'));
+        console.warn('room alias:\t' + (formData.roomAlias || 'not set'));
+
         this.props.onSubmit(formData);
 
         return true;
@@ -483,6 +488,12 @@ export default class Login extends React.Component {
                                 <td>Interact with the entity in the centre of your field of view.
                                     Zap the door to show your demo options; zap an option to enter the demo;
                                     zap to skip through the demo.</td>
+                            </tr>
+                            <tr>
+                                <td style={{ textAlign: 'center' }}>G</td>
+                                <td></td>
+                                <td></td>
+                                <td>Toggle guest or actual Matrix names in video conference.</td>
                             </tr>
                             <tr>
                                 <td style={{ textAlign: 'center' }}>I</td>

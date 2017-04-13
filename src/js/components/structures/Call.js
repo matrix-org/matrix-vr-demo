@@ -43,12 +43,6 @@ export default class Call extends EventEmitter {
         if (!this.remoteVideo.parentElement) {
             this.parentElement.appendChild(this.remoteVideo);
         }
-        const onLoadedMetadata = (e) => {
-            this.active = true;
-            console.warn(`Call to ${this.peerId} is now active`);
-            this.emit('callActive', this.peerId);
-        };
-        this.remoteVideo.addEventListener('loadedmetadata', onLoadedMetadata);
         this.active = this.remoteVideo.videoWidth > 0;
         if (this.active) {
             this.emit('callActive');
@@ -56,11 +50,15 @@ export default class Call extends EventEmitter {
 
         this._addListeners = this._addListeners.bind(this);
         this._callPeer = this._callPeer.bind(this);
+        this._cleanUp = this._cleanUp.bind(this);
         this._constructFromMatrixCall = this._constructFromMatrixCall.bind(this);
+        this._debugLog = this._debugLog.bind(this);
         this._onError = this._onError.bind(this);
         this._onHangup = this._onHangup.bind(this);
+        this._onLoadedMetadata = this._onLoadedMetadata.bind(this);
         this._onUserJoined = this._onUserJoined.bind(this);
         this._prepareCall = this._prepareCall.bind(this);
+        this._removeListeners = this._removeListeners.bind(this);
 
         this.answer = this.answer.bind(this);
         this.callPeer = this.callPeer.bind(this);
@@ -73,34 +71,54 @@ export default class Call extends EventEmitter {
         }
     }
 
+    _debugLog(...args) {
+        console.warn(`Call ${this.id}: ${this.call && this.call.callId}:`, ...args);
+    }
+
+    _onLoadedMetadata(e) {
+        this.active = true;
+        this._debugLog(`Call to ${this.peerId} is now active`);
+        this.emit('callActive', this.peerId);
+    }
+
     _cleanUp() {
-        if (this.localVideo.parentElement) {
-            this.localVideo.parentElement.removeChild(this.localVideo);
+        if (this.call) {
+            this.call.removeListener('hangup', this._onHangup);
+            this.call.removeListener('error', this._onError);
         }
-        if (this.remoteVideo.parentElement) {
-            this.remoteVideo.parentElement.removeChild(this.remoteVideo);
-        }
-        this.call.removeListener('hangup', this._onHangup);
-        this.call.removeListener('error', this._onError);
         this.client.removeListener('syncComplete', this._prepareCall);
         this.client.removeListener('userJoined', this._onUserJoined);
     }
 
     _onHangup() {
-        console.warn(this.client.userId + ': Hang up.' +
+        if (this._replacementCall) {
+            this._debugLog(`Observed glare for outgoing call ${this.call.callId}` +
+                `, replacing with incoming call ${this._replacementCall.callId}`);
+            this._replacementCall = null;
+            return;
+        }
+        this._debugLog(this.client.userId + ': Hang up.' +
             (this._lastError ? ' Last error: ' + this._lastError : ''));
         this.emit('hungUp', this.peerId);
+        this._removeListeners();
     }
 
     _onError(err) {
         this._lastError = err.message;
-        console.warn(`ERROR: ${err.message}\n${err.stack}`);
+        this._debugLog(`ERROR: ${err.message}\n${err.stack}`);
         this.call.hangup();
     }
 
     _addListeners() {
+        this.remoteVideo.addEventListener('loadedmetadata', this._onLoadedMetadata);
         this.call.on('hangup', this._onHangup);
         this.call.on('error', this._onError);
+    }
+
+    _removeListeners() {
+        this.remoteVideo.removeEventListener('loadedmetadata', this._onLoadedMetadata);
+        this.call.removeListener('hangup', this._onHangup);
+        this.call.removeListener('error', this._onError);
     }
 
     _constructFromMatrixCall(matrixCall) {
@@ -112,9 +130,14 @@ export default class Call extends EventEmitter {
 
     _callPeer(peer) {
         this.call = this.client.createCall(peer.roomId);
-        console.warn(`${this.client.userId} CALLING ${peer.userId}`);
+        this._debugLog(`${this.client.userId} CALLING ${peer.userId}`);
         this._addListeners();
+        const onReplaced = (newCall) => {
+            this._replacementCall = newCall;
+        };
+        this.call.on('replaced', onReplaced);
         this.call.placeVideoCall(this.remoteVideo, this.localVideo);
+        this.call.removeListener('replaced', onReplaced);
     }
 
     answer() {
@@ -151,9 +174,9 @@ export default class Call extends EventEmitter {
             invite: [this.peerId],
             name: CALL_ROOM_NAME,
         }).then(({roomId}) => {
-            console.warn(`${this.client.userId} created room ${roomId}`
+            this._debugLog(`${this.client.userId} created room ${roomId}`
                 + ` and invited ${this.peerId}`);
-        }).catch((e) => console.warn(this.client.userId + ': ERROR: '
+        }).catch((e) => this._debugLog(this.client.userId + ': ERROR: '
             + e.message + '\n' + e.stack));
     }
 
@@ -179,7 +202,6 @@ export default class Call extends EventEmitter {
             console.log(`Hanging up on ${this.peerId}`);
             this.call.hangup();
             this.active = false;
-            this.emit('hungUp', this.peerId);
         }
     }
 }

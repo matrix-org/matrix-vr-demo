@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 
+import {default as dispatcher} from '../../common/dispatcher';
 import React from 'react';
 import {Entity} from 'aframe-react';
 import CallView from './CallView';
@@ -41,9 +42,13 @@ export default class ConferenceView extends React.Component {
 
         this.state = {
             calls: props.conference.getParticipantCalls(),
+            useLocalPart: false,
         };
 
+        this._onKeyEvent = this._onKeyEvent.bind(this);
         this._participantsChanged = this._participantsChanged.bind(this);
+
+        dispatcher.addListener('keyEvent', this._onKeyEvent);
         props.conference.on('participantsChanged', this._participantsChanged);
 
         this.peerIdToGuest = {};
@@ -56,10 +61,18 @@ export default class ConferenceView extends React.Component {
         });
     }
 
+    _onKeyEvent(key) {
+        if (key === 'g') {
+            this.setState({
+                useLocalPart: !this.state.useLocalPart,
+            });
+        }
+    }
+
     componentWillUnmount() {
         this.props.conference.removeListener('participantsChanged',
             this._participantsChanged);
-        this.props.conference.hangUp();
+        dispatcher.removeListener('keyEvent', this._onKeyEvent);
     }
 
     render() {
@@ -77,7 +90,7 @@ export default class ConferenceView extends React.Component {
                 );
                 const localpart = call.peerId.match(/@([a-zA-Z0-9_-]+):.*/)[1];
                 let peerName;
-                if (localpart.match(/^mxvr[0-9]+$/)) {
+                if (!this.state.useLocalPart && localpart.match(/^mxvr[0-9]+$/)) {
                     peerName = this.peerIdToGuest[call.peerId];
                     if (!peerName) {
                         peerName = `Guest ${Object.keys(this.peerIdToGuest).length + 1}`;
@@ -121,7 +134,7 @@ export default class ConferenceView extends React.Component {
                 position={[0, planeYPos, -this.props.radius]}
                 rotation={[0, angle, 0]}
                 faceCamera={false}
-                text='You' />);
+                text={this.state.useLocalPart ? this.props.conference.client.username : 'You'} />);
         }
         console.warn('Rendering ConferenceView');
 
