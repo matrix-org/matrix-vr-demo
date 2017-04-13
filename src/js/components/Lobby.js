@@ -91,10 +91,14 @@ export default class Lobby extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        if ((this.props.room !== nextProps.room) && this.state.showPlaygroundGeometry) {
+            this.setState({showPlaygroundGeometry: false});
+        }
+    }
+
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.room !== 'lobby' && this.props.room === 'lobby') {
-            this.setState({showPlaygroundGeometry: false});
-
             // Navigation UI toggle
             this.refs['navigationSphere'].removeEventListener('click', this.navigateToLobby);
             this.refs['navigationSphere'].addEventListener('click', this.togglePlaygroundGeometry);
@@ -183,6 +187,8 @@ export default class Lobby extends React.Component {
                         ringbackDidHide={this.ringbackDidHide}
                         ringbackPlayed={this.props.ringbackPlayed}
                         ringbackDidPlay={this.props.ringbackDidPlay}
+                        loopRingback={true}
+                        startDelay={5000}
                     />
                 )}
 
@@ -203,6 +209,7 @@ export default class Lobby extends React.Component {
                         conference={this.props.conference}
                         position={[0, 1, 0]}
                         fov={120}
+                        radius={1.5}
                         scaleThreshold={2}
                         showTable={true}
                     />
