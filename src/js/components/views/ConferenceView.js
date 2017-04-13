@@ -73,7 +73,6 @@ export default class ConferenceView extends React.Component {
         this.props.conference.removeListener('participantsChanged',
             this._participantsChanged);
         dispatcher.removeListener('keyEvent', this._onKeyEvent);
-        this.props.conference.hangUp();
     }
 
     render() {
