@@ -490,6 +490,12 @@ export default class Login extends React.Component {
                                     zap to skip through the demo.</td>
                             </tr>
                             <tr>
+                                <td style={{ textAlign: 'center' }}>G</td>
+                                <td></td>
+                                <td></td>
+                                <td>Toggle guest or actual Matrix names in video conference.</td>
+                            </tr>
+                            <tr>
                                 <td style={{ textAlign: 'center' }}>I</td>
                                 <td></td>
                                 <td></td>
