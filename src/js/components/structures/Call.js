@@ -91,6 +91,12 @@ export default class Call extends EventEmitter {
     }
 
     _onHangup() {
+        if (this._replacementCall) {
+            this._debugLog(`Observed glare for outgoing call ${this.call.callId}` +
+                `, replacing with incoming call ${this._replacementCall.callId}`);
+            this._replacementCall = null;
+            return;
+        }
         this._debugLog(this.client.userId + ': Hang up.' +
             (this._lastError ? ' Last error: ' + this._lastError : ''));
         this.emit('hungUp', this.peerId);
@@ -126,7 +132,12 @@ export default class Call extends EventEmitter {
         this.call = this.client.createCall(peer.roomId);
         this._debugLog(`${this.client.userId} CALLING ${peer.userId}`);
         this._addListeners();
+        const onReplaced = (newCall) => {
+            this._replacementCall = newCall;
+        };
+        this.call.on('replaced', onReplaced);
         this.call.placeVideoCall(this.remoteVideo, this.localVideo);
+        this.call.removeListener('replaced', onReplaced);
     }
 
     answer() {
