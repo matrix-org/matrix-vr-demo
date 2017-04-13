@@ -61,7 +61,7 @@ export default class VideoView extends React.Component {
                     attribute='scale'
                     dur='1000'
                     from='0 0 0'
-                    to='1 1 1'></a-animation>
+                    to='0.8 0.8 1'></a-animation>
             </a-text>;
         }
 
