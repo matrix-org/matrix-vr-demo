@@ -35,6 +35,7 @@ export default class Ringback extends React.Component {
         this.playNextVideo = this.playNextVideo.bind(this);
         this.playVideo = this.playVideo.bind(this);
         this.queueVideo = this.queueVideo.bind(this);
+        this._clearTimeouts = this._clearTimeouts.bind(this);
         this._onKeyEvent = this._onKeyEvent.bind(this);
         this.videos = [];
         this.showAnimationLength = 1500;
@@ -89,14 +90,18 @@ export default class Ringback extends React.Component {
         }
     }
 
+    _clearTimeouts() {
+        if (this.showRingbackTimeout) clearTimeout(this.showRingbackTimeout);
+        if (this.showVideoTimeout) clearTimeout(this.showVideoTimeout);
+        if (this.playVideoTimeout) clearTimeout(this.playVideoTimeout);
+    }
+
     componentWillUnmount() {
         this.stopVideo();
         this.refs.videoPlane.removeEventListener('animationend', this.ringbackHidden);
         dispatcher.removeListener('keyEvent', this._onKeyEvent);
 
-        if (this.showRingbackTimeout) clearTimeout(this.showRingbackTimeout);
-        if (this.showVideoTimeout) clearTimeout(this.showVideoTimeout);
-        if (this.playVideoTimeout) clearTimeout(this.playVideoTimeout);
+        this._clearTimeouts();
 
         // Clean up an unused / incomplete playlist resources
         this.playlist.cleanup();
@@ -147,6 +152,7 @@ export default class Ringback extends React.Component {
 
     stopRingback() {
         console.warn('Stopping ringback');
+        this._clearTimeouts();
         if (!this.videos[this.state.videoIndex].paused) {
             this.videos[this.state.videoIndex].pause();
         }
