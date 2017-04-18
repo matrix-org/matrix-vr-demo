@@ -72,8 +72,8 @@ export default class FullMeshConference extends EventEmitter {
                         `attempted.)\nRefresh and try a room with fewer members.`);
                     return;
                 }
-                this._debugLog('Joined conference room');
                 this.roomId = room.roomId;
+                this._debugLog('Joined conference room');
                 this.emit('ready', this.roomId);
             }).catch((e) => console.error(`ERROR: ${e.message}`, e));
         };
