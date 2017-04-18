@@ -163,12 +163,11 @@ export default class Ringback extends React.Component {
     }
 
     ringbackHidden(e) {
-        this.refs.videoPlane.removeEventListener('animationend', this.ringbackHidden);
-        dispatcher.removeListener('keyEvent', this._onKeyEvent);
-
         const ele = e.target || e.srcElement; // for IE
         if (ele.id === 'ringbackHideScale' || ele.id === 'ringbackHideOpacity') {        // Ringback hide complete
             console.warn('Ringback hide complete');
+            this.refs.videoPlane.removeEventListener('animationend', this.ringbackHidden);
+            dispatcher.removeListener('keyEvent', this._onKeyEvent);
             if (this.props.ringbackDidHide && typeof this.props.ringbackDidHide === 'function') {
                 this.props.ringbackDidHide();
             }
