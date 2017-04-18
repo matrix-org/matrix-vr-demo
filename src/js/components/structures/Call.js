@@ -133,11 +133,12 @@ export default class Call extends EventEmitter {
         this._debugLog(`${this.client.userId} CALLING ${peer.userId}`);
         this._addListeners();
         const onReplaced = (newCall) => {
+            this._debugLog(`Glare detected, replacing call with ${newCall.callId}`);
+            this.call.removeListener('replaced', onReplaced);
             this._replacementCall = newCall;
         };
         this.call.on('replaced', onReplaced);
         this.call.placeVideoCall(this.remoteVideo, this.localVideo);
-        this.call.removeListener('replaced', onReplaced);
     }
 
     answer() {
