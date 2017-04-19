@@ -44,10 +44,10 @@ export default class VideoView extends React.Component {
 
     render() {
         let text;
-        if (this.props.text.length > 0) {
+        if (this.props.text.length > 0 || !this.props.hasVideo) {
             const textValue = this.props.hasVideo ?
-                this.props.text :
-                `No video for:\n${this.props.text}`;
+                this.props.text : this.props.text.length > 0 ?
+                `No video for:\n${this.props.text}` : 'No video';
             const textYPos = this.props.hasVideo ?
                 -(this.props.height / 2) - 0.1 :
                 0.0;
