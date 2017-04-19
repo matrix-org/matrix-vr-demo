@@ -64,12 +64,12 @@ export default class Client extends EventEmitter {
         this._initClient();
     }
 
-    _debugLog(msg) {
-        console.warn(`Client: ${this.username} - ${msg}`);
+    _debugLog(...args) {
+        console.warn(`Client: ${this.username}:`, ...args);
     }
 
     _persistCredentials() {
-        console.warn("Persisting credentials to localStorage");
+        this._debugLog('Persisting credentials to localStorage');
         localStorage.setItem('mxvr_user_id', this.userId);
         localStorage.setItem('mxvr_access_token', this.accessToken);
         localStorage.setItem('mxvr_hs_url', this.homeserver);
@@ -106,7 +106,7 @@ export default class Client extends EventEmitter {
                     this.username,
                     Math.random().toString(36).substring(7),
                     null,
-                    {type: 'm.login.dummy'}
+                    {type: 'm.login.dummy'},
                 );
             } else {
                 this._debugLog('Logging in...');
@@ -152,11 +152,12 @@ export default class Client extends EventEmitter {
                     if (member.userId === this.userId) {
                         if (!room || room.getJoinedMembers()
                                 .filter((m) => m.userId === this.userId).length === 0) {
-                            console.warn(`${member.userId} not yet a member - joining ${member.roomId}`)
+                            this._debugLog(`${member.userId} not yet a member` +
+                                ` - joining ${member.roomId}`);
                             // auto-join when invited and not a member
                             this.joinRoomWithId(member.roomId)
                             .then((room) => {
-                                console.warn(`Auto-joined room ${member.roomId}`);
+                                this._debugLog(`Auto-joined room ${member.roomId}`);
                             }).catch((e) => console.error(e));
                         }
                     }
@@ -187,13 +188,13 @@ export default class Client extends EventEmitter {
         });
 
         this.client.on('Room', (room) => {
-            console.warn(`${this.userId} joined ${room.roomId}`);
+            this._debugLog(`${this.userId} joined ${room.roomId}`);
             this.emit('joinedRoom', room.roomId);
         });
 
         this.client.on('Call.incoming', (call) => {
             if (this.synced) {
-                console.warn(`Incoming call in room ${call.roomId}`);
+                this._debugLog(`Incoming call in room ${call.roomId}`);
                 this.emit('incomingCall', call);
             }
         });
@@ -210,7 +211,7 @@ export default class Client extends EventEmitter {
                         });
                         break;
                     default:
-                        // too chatty: console.warn('Event received', event.getType());
+                        // too chatty: this._debugLog('Event received', event.getType());
                 }
             }
         });
@@ -238,7 +239,7 @@ export default class Client extends EventEmitter {
         const promise = new Promise((resolve, reject) => {
             roomCallback = (room) => {
                 if (room && room.roomId === roomId) {
-                    console.warn('JS SDK received Room event:', room);
+                    this._debugLog('JS SDK received Room event:', room);
                     clearTimeout(timeoutId);
                     this.client.removeListener('Room', roomCallback);
                     resolve(room);
@@ -274,7 +275,7 @@ export default class Client extends EventEmitter {
                     event.getContent().aliases.map((alias) => {
                         if (alias === roomAlias) {
                             // room exists and we are joined
-                            console.warn(`JS SDK (${caller}) received alias`, alias);
+                            this._debugLog(`JS SDK (${caller}) received alias`, alias);
                             clearTimeout(timeoutId);
                             this.client.removeListener('RoomState.events',
                                 roomStateCallback);
@@ -305,7 +306,8 @@ export default class Client extends EventEmitter {
                 room = await roomEvent.promise;
             }
             if (!room) {
-                throw new Error(`JS SDK (${caller}) did not receive Room event and so does not have the room`);
+                throw new Error(`JS SDK (${caller}) did not receive Room event` +
+                    'and so does not have the room');
             }
             return room;
         } catch (e) {
@@ -324,9 +326,9 @@ export default class Client extends EventEmitter {
             if (!hasAlias) {
                 throw new Error(`JS SDK (${caller}) did not receive aliases for room`);
             }
-            console.warn('JS SDK joined', roomAlias, ':', room);
+            this._debugLog('JS SDK joined', roomAlias, ':', room);
             // room exists and we are joined
-            console.warn(`${this.userId} joined ${roomAlias} (${caller})`);
+            this._debugLog(`${this.userId} joined ${roomAlias} (${caller})`);
             return room;
         } catch (e) {
             throw e;
@@ -335,14 +337,14 @@ export default class Client extends EventEmitter {
 
     async joinRoomWithAlias(roomAlias, createOptions) {
         try {
-            console.log(`Attempting to join room ${roomAlias}`);
+            this._debugLog(`Attempting to join room ${roomAlias}`);
             const joinedRoom = await this.client.joinRoom(roomAlias);
             const room = await this._waitForRoomAndAliases('joinRoom',
                 roomAlias, joinedRoom.roomId);
             return room;
         } catch (e) {
             if (e.errcode === 'M_NOT_FOUND') {
-                console.warn(`IGNORE THE 404 - Attempting to create room ${roomAlias}`);
+                this._debugLog(`IGNORE THE 404 - Attempting to create room ${roomAlias}`);
                 // room does not exist
                 const createdRoom = await this.client.createRoom(createOptions);
                 const room = await this._waitForRoomAndAliases('createRoom',
@@ -355,7 +357,7 @@ export default class Client extends EventEmitter {
     }
 
     async joinRoomWithId(roomId) {
-        console.log(`Attempting to join room ${roomId}`);
+        this._debugLog(`Attempting to join room ${roomId}`);
         try {
             const joinedRoom = await this.client.joinRoom(roomId);
             const room = await this._waitForRoom(joinedRoom.roomId, 'joinRoom');
@@ -372,7 +374,7 @@ export default class Client extends EventEmitter {
     getJoinedMembers(roomId) {
         const room = this.client.getRoom(roomId);
         if (!room) {
-            console.warn(`Room ${roomId} not found`);
+            this._debugLog(`Room ${roomId} not found`);
             return [];
         }
 
@@ -388,7 +390,7 @@ export default class Client extends EventEmitter {
     getRoomAliases(roomId) {
         const room = this.client.getRoom(roomId);
         if (!room) {
-            console.warn(`Room ${roomId} not found`);
+            this._debugLog(`Room ${roomId} not found`);
             return [];
         }
         return room.getAliases();
