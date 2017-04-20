@@ -95,7 +95,7 @@ export default class Login extends React.Component {
             password: '',
             accessToken: null,
             homeserver: CONF_HOME_SERVER,
-            peerId: getParameterByName('guideId') || '',
+            peerId: getParameterByName('guideId'),
             roomAlias: null,
             loginType: 'guest',
         };
@@ -106,7 +106,8 @@ export default class Login extends React.Component {
         }
 
         if (localStorage) {
-            state.peerId = localStorage.getItem('mxvr_peer_id') || state.peerId;
+            state.peerId = state.peerId ||
+                localStorage.getItem('mxvr_peer_id');
             state.roomAlias = state.roomAlias ||
                 localStorage.getItem('mxvr_conf_room_alias');
 

@@ -26,10 +26,21 @@ export default class CallView extends React.Component {
 
         this.state = {
             callActive: false,
+            hasVideo: false,
         };
 
         this._onCallActive = this._onCallActive.bind(this);
         this._onCallHungUp = this._onCallHungUp.bind(this);
+        this._hasVideoTrack = this._hasVideoTrack.bind(this);
+    }
+
+    _hasVideoTrack() {
+        const element = this.props.showLocal ? this.props.call.getLocalVideoElement() :
+            this.props.call.getRemoteVideoElement();
+        if (!element || !element.srcObject) {
+            return false;
+        }
+        return element.srcObject.getVideoTracks().length > 0;
     }
 
     componentDidMount() {
@@ -37,6 +48,7 @@ export default class CallView extends React.Component {
             console.warn(`Call for ${this.props.call.peerId} became active`);
             this.setState({
                 callActive: true,
+                hasVideo: this._hasVideoTrack(),
             });
         }
         this.props.call.on('callActive', this._onCallActive);
@@ -47,6 +59,7 @@ export default class CallView extends React.Component {
         console.warn(`Call for ${peerId} became active`);
         this.setState({
             callActive: true,
+            hasVideo: this._hasVideoTrack(),
         });
     }
 
@@ -54,6 +67,7 @@ export default class CallView extends React.Component {
         console.warn(`Call for ${this.props.call.peerId} hung up`);
         this.setState({
             callActive: false,
+            hasVideo: this._hasVideoTrack(),
         });
     }
 
@@ -79,7 +93,8 @@ export default class CallView extends React.Component {
                         rotation={this.props.rotation}
                         opacity={this.props.opacity}
                         faceCamera={this.props.faceCamera}
-                        text={this.props.text} />
+                        text={this.props.text}
+                        hasVideo={this.state.hasVideo} />
                 }
             </Entity>
         );

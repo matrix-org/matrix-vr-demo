@@ -139,6 +139,7 @@ export default class Call extends EventEmitter {
         };
         this.call.on('replaced', onReplaced);
         this.call.placeVideoCall(this.remoteVideo, this.localVideo);
+        this.call.setRemoteAudioElement(this.remoteVideo);
     }
 
     answer() {
