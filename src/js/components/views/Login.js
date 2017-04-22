@@ -126,6 +126,7 @@ export default class Login extends React.Component {
         if (!state.roomAlias) {
             state.roomAlias = this.generateRoomAlias();
         }
+        state.peerId = state.peerId || '';
 
         window.location.hash = makeHash(state.roomAlias, state.peerId);
 
@@ -190,7 +191,7 @@ export default class Login extends React.Component {
         }
         formData.homeserver = this.state.homeserver;
 
-        if (this.state.peerId.length >= 4) { // '@a:b'.length === 4
+        if (this.state.peerId && this.state.peerId.length >= 4) { // '@a:b'.length === 4
             const peerIdMatches = this.state.peerId.match(USERNAME_REGEX);
             if (!peerIdMatches || peerIdMatches.length < 3) {
                 postAlert('Invalid 1:1 peer ID.');
@@ -204,7 +205,6 @@ export default class Login extends React.Component {
             formData.peerId = this.state.peerId;
         }
 
-        // FIXME - validation
         const roomAlias = getRoomAlias(this.state.roomAlias, this.state.homeserver);
         if (!roomAlias || roomAlias.length < 4) { // '#a:b'.length === 4
             postAlert('Invalid room alias - are the room name and homeserver valid?');
