@@ -179,8 +179,8 @@ export default class ConferenceView extends React.Component {
                             <a-text
                                 value={this.props.conference.roomAlias}
                                 width={this.props.radius}
-                                position={[0, 0.56 * this.props.radius, 0].join(' ')}
-                                color='#ffffff'
+                                position={[0, 0.5 * this.props.radius, 0].join(' ')}
+                                color='#ccc'
                                 align='center'></a-text>
                         }
                     </a-circle>
