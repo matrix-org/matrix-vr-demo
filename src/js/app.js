@@ -304,6 +304,14 @@ function finalClientInit(options) {
 
     ReactDOM.render(<VRScene client={client} />, sceneContainer);
 
+    client.on('message', (event) => {
+        if (event.userId === client.peerId &&
+            event.content.msgtype === 'm.text' &&
+            event.content.body.length > 1) {
+            dispatcher.emit('message', event.content.body);
+        }
+    });
+
     dispatcher.on('keyEvent', (key) => switchScene(key, client));
 }
 
