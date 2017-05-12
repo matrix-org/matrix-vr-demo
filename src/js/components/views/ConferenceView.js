@@ -18,6 +18,7 @@ limitations under the License.
 import {default as dispatcher} from '../../common/dispatcher';
 import React from 'react';
 import {Entity} from 'aframe-react';
+import 'aframe-html-shader';
 import CallView from './CallView';
 import FullMeshConference from '../structures/FullMeshConference';
 
@@ -42,13 +43,16 @@ export default class ConferenceView extends React.Component {
 
         this.state = {
             calls: props.conference.getParticipantCalls(),
+            messages: [],
             useLocalPart: false,
         };
 
         this._onKeyEvent = this._onKeyEvent.bind(this);
+        this._onMessage = this._onMessage.bind(this);
         this._participantsChanged = this._participantsChanged.bind(this);
 
         dispatcher.addListener('keyEvent', this._onKeyEvent);
+        dispatcher.addListener('message', this._onMessage);
         props.conference.on('participantsChanged', this._participantsChanged);
 
         this.peerIdToGuest = {};
@@ -67,6 +71,17 @@ export default class ConferenceView extends React.Component {
                 useLocalPart: !this.state.useLocalPart,
             });
         }
+    }
+
+    _onMessage(message) {
+        let newMessages = this.state.messages.slice(0);
+        if (newMessages.length === 10) {
+            newMessages = newMessages.slice(1, 10);
+        }
+        newMessages.push(message);
+        this.setState({
+            messages: newMessages,
+        });
     }
 
     componentWillUnmount() {
@@ -140,6 +155,15 @@ export default class ConferenceView extends React.Component {
 
         const tableYPos = PLANE_HEIGHT_FROM_GROUND - (PLANE_SPACING + 0.5 * PLANE_HEIGHT);
 
+        const messages = this.state.messages.map((message, index) => {
+            return <p className='message'>{message}</p>;
+        });
+        // FIXME: We have to wait for the render updates of the messages to have been written to the DOM before doing this.
+        setTimeout(() => {
+            const el = document.getElementById('oneToOneMessages');
+            el.scrollTop = el.scrollHeight;
+        }, 100);
+
         return (
             <Entity position={this.props.position}>
                 {callViews}
@@ -161,6 +185,13 @@ export default class ConferenceView extends React.Component {
                         }
                     </a-circle>
                 }
+                <div className='oneToOneMessages' id='oneToOneMessages'>
+                    {messages}
+                </div>
+                <a-entity
+                    geometry='primitive: plane; width: 0.8; height: 0.225;'
+                    position={[0, 0.17, -0.5 * this.props.radius].join(' ')}
+                    material='shader: html; target: #oneToOneMessages; transparent: true; fps: 1.5;'></a-entity>
             </Entity>
         );
     }
