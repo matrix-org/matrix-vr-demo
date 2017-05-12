@@ -173,3 +173,17 @@ a:visited {
 .small {
     font-size: 85%;
 }
+
+div.oneToOneMessages {
+    overflow: hidden!important;
+    word-wrap: break-word;
+    width: 1280px;
+    height: 360px;
+    z-index: -1;
+}
+
+p.message {
+    color: #ffffff;
+    font-size: 56px;
+    width: 100%;
+}
