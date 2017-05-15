@@ -185,5 +185,6 @@ div.oneToOneMessages {
 p.message {
     color: #ffffff;
     font-size: 56px;
+    margin: 0px;
     width: 100%;
 }

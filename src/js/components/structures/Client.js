@@ -57,6 +57,7 @@ export default class Client extends EventEmitter {
         this.joinRoomWithAlias = this.joinRoomWithAlias.bind(this);
         this.joinRoomWithId = this.joinRoomWithId.bind(this);
         this.leaveRoom = this.leaveRoom.bind(this);
+        this.getDisplayNameForUser = this.getDisplayNameForUser.bind(this);
         this.getRooms = this.getRooms.bind(this);
         this.getRoomAliases = this.getRoomAliases.bind(this);
         this.getRoomIdForAlias = this.getRoomIdForAlias.bind(this);
@@ -371,6 +372,11 @@ export default class Client extends EventEmitter {
         return this.client.leave(roomId);
     }
 
+    getDisplayNameForUser(userId) {
+        const user = this.client.getUser(userId);
+        return user && user.displayName ? user.displayName : userId;
+    }
+
     getJoinedMembers(roomId) {
         const room = this.client.getRoom(roomId);
         if (!room) {
@@ -398,5 +404,9 @@ export default class Client extends EventEmitter {
 
     getRoomIdForAlias(alias) {
         return this.client.getRoomIdForAlias(alias).then((roomId) => roomId);
+    }
+
+    mxcUrlToHttp(mxcUrl) {
+        return this.client.mxcUrlToHttp(mxcUrl);
     }
 }
