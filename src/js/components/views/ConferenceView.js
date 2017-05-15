@@ -209,7 +209,8 @@ export default class ConferenceView extends React.Component {
         const tableYPos = PLANE_HEIGHT_FROM_GROUND - (PLANE_SPACING + 0.5 * PLANE_HEIGHT);
 
         const messages = this.state.messages.map((message, index) => {
-            return <p className='message' key={message.message + message.timestamp}>{message.message}</p>;
+            const displayName = this.props.conference.client.getDisplayNameForUser(message.sender);
+            return <p className='message' key={message.message + message.timestamp}><b>{displayName}</b>: {message.message}</p>;
         });
         // FIXME: We have to wait for the render updates of the messages to have been written to the DOM before doing this.
         setTimeout(() => {
