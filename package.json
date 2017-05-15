@@ -7,6 +7,7 @@
     "aframe": "matrix-org/aframe#master",
     "aframe-auto-detect-controllers-component": "^0.1.4",
     "aframe-controller-cursor-component": "^0.2.1",
+    "aframe-html-shader": "^0.1.1",
     "aframe-look-at-component": "matrix-org/aframe-look-at-component#master",
     "aframe-mouse-cursor-component": "^0.4.1",
     "aframe-react": "^3.5.0",
