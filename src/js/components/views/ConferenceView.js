@@ -20,6 +20,7 @@ import React from 'react';
 import {Entity} from 'aframe-react';
 import 'aframe-html-shader';
 import CallView from './CallView';
+import ImageView from './ImageView';
 import FullMeshConference from '../structures/FullMeshConference';
 
 const PLANE_WIDTH = 1;
@@ -43,14 +44,17 @@ export default class ConferenceView extends React.Component {
 
         this.state = {
             calls: props.conference.getParticipantCalls(),
+            images: [],
             messages: [],
             useLocalPart: false,
         };
 
+        this._onImage = this._onImage.bind(this);
         this._onKeyEvent = this._onKeyEvent.bind(this);
         this._onMessage = this._onMessage.bind(this);
         this._participantsChanged = this._participantsChanged.bind(this);
 
+        dispatcher.addListener('image', this._onImage);
         dispatcher.addListener('keyEvent', this._onKeyEvent);
         dispatcher.addListener('message', this._onMessage);
         props.conference.on('participantsChanged', this._participantsChanged);
@@ -62,6 +66,17 @@ export default class ConferenceView extends React.Component {
         console.warn('participantsChanged');
         this.setState({
             calls: this.props.conference.getParticipantCalls(),
+        });
+    }
+
+    _onImage(image) {
+        let newImages = this.state.images.slice(0);
+        if (newImages.length === 9) {
+            newImages = newImages.slice(0, 8);
+        }
+        newImages.prepend(image);
+        this.setState({
+            images: newImages,
         });
     }
 
@@ -88,14 +103,17 @@ export default class ConferenceView extends React.Component {
         this.props.conference.removeListener('participantsChanged',
             this._participantsChanged);
         dispatcher.removeListener('keyEvent', this._onKeyEvent);
+        dispatcher.removeListener('image', this._onImage);
+        dispatcher.removeListener('message', this._onMessage);
     }
 
     render() {
         const calls = this.state.calls.filter((call) => call.active);
-        let callViews = [];
-        if (calls.length) {
-            let modRemainder = calls.length + 1;
-            callViews = calls.map((call, index) => {
+        let mediaViews = [];
+        if (calls.length + this.state.images.length > 0) {
+            const callViewCount = calls.length + (calls.length > 0 ? 1 : 0);
+            let modRemainder = callViewCount + this.state.images.length;
+            mediaViews = calls.map((call, index) => {
                 if (index && index % ROW_LENGTH === 0) {
                     modRemainder -= ROW_LENGTH;
                 }
@@ -130,27 +148,51 @@ export default class ConferenceView extends React.Component {
                 );
             });
 
-
-            if (calls.length % ROW_LENGTH === 0) {
-                modRemainder -= ROW_LENGTH;
-            }
-            const angle = indexToAngle(
-                modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
-                calls.length % ROW_LENGTH, this.props.fov, this.props.radius,
-            );
-            const planeYPos = PLANE_HEIGHT_FROM_GROUND +
+            if (calls.length > 0) {
+                if (calls.length % ROW_LENGTH === 0) {
+                    modRemainder -= ROW_LENGTH;
+                }
+                const angle = indexToAngle(
+                    modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
+                    calls.length % ROW_LENGTH, this.props.fov, this.props.radius,
+                );
+                const planeYPos = PLANE_HEIGHT_FROM_GROUND +
                 Math.floor(calls.length / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
-            callViews.push(<CallView
-                key={`local-${calls[0].id}`}
-                showLocal={true}
-                call={calls[0]}
-                width={PLANE_WIDTH}
-                height={PLANE_HEIGHT}
-                position={[0, planeYPos, -this.props.radius]}
-                rotation={[0, angle, 0]}
-                faceCamera={false}
-                text={this.state.useLocalPart ? this.props.conference.client.username : 'You'} />);
+                mediaViews.push(<CallView
+                    key={`local-${calls[0].id}`}
+                    showLocal={true}
+                    call={calls[0]}
+                    width={PLANE_WIDTH}
+                    height={PLANE_HEIGHT}
+                    position={[0, planeYPos, -this.props.radius]}
+                    rotation={[0, angle, 0]}
+                    faceCamera={false}
+                    text={this.state.useLocalPart ? this.props.conference.client.username : 'You'} />);
+            }
+
+            this.state.images.map((image, imageIndex) => {
+                const index = callViewCount + imageIndex;
+                if (index && index % ROW_LENGTH === 0) {
+                    modRemainder -= ROW_LENGTH;
+                }
+                const angle = indexToAngle(
+                    modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
+                    index % ROW_LENGTH, this.props.fov, this.props.radius,
+                );
+
+                const planeYPos = PLANE_HEIGHT_FROM_GROUND +
+                    Math.floor(index / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
+                mediaViews.push(<ImageView
+                    key={image}
+                    src={image}
+                    width={PLANE_WIDTH}
+                    height={PLANE_HEIGHT}
+                    position={[0, planeYPos, -this.props.radius]}
+                    rotation={[0, angle, 0]}
+                    faceCamera={false} />);
+            });
         }
+
         console.warn('Rendering ConferenceView');
 
         const tableYPos = PLANE_HEIGHT_FROM_GROUND - (PLANE_SPACING + 0.5 * PLANE_HEIGHT);
@@ -166,7 +208,7 @@ export default class ConferenceView extends React.Component {
 
         return (
             <Entity position={this.props.position}>
-                {callViews}
+                {mediaViews}
                 {this.props.showTable &&
                     <a-circle
                         radius={this.props.radius}

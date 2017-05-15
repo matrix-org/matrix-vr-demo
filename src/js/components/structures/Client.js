@@ -399,4 +399,8 @@ export default class Client extends EventEmitter {
     getRoomIdForAlias(alias) {
         return this.client.getRoomIdForAlias(alias).then((roomId) => roomId);
     }
+
+    mxcUrlToHttp(mxcUrl) {
+        return this.client.mxcUrlToHttp(mxcUrl);
+    }
 }
