@@ -20,6 +20,7 @@ import Call from './Call';
 import {createVideoElement} from './utils';
 
 const VC_ROOM_NAME = 'Matrix VR Demo';
+const VR_USER_REGEX = /mxvr[0-9]+/;
 const MEMBER_LIMIT = 9;
 
 export default class FullMeshConference extends EventEmitter {
@@ -96,7 +97,7 @@ export default class FullMeshConference extends EventEmitter {
 
         // add new peers to peersToCall
         peers.reduce((acc, peer) => {
-            if (!peer.match(/mxvr[0-9]+/)) {
+            if (!peer.match(VR_USER_REGEX)) {
                 return acc;
             }
             if (!this.peersToCall.has(peer) && !this.calledPeers.has(peer)) {
@@ -142,7 +143,8 @@ export default class FullMeshConference extends EventEmitter {
 
     _addClientListeners() {
         this.client.on('userJoined', (member) => {
-            if (this.roomId && member.roomId === this.roomId) {
+            if (this.roomId && member.roomId === this.roomId &&
+                    member.userId.match(VR_USER_REGEX)) {
                 if (!this.peersToCall.has(member.userId)) {
                     // this is needed for house keeping in _callNewPeer
                     this.peersToCall.add(member.userId);
@@ -154,7 +156,8 @@ export default class FullMeshConference extends EventEmitter {
         });
 
         this.client.on('userLeft', (member) => {
-            if (this.roomId && member.roomId === this.roomId) {
+            if (this.roomId && member.roomId === this.roomId &&
+                    member.userId.match(VR_USER_REGEX)) {
                 if (this.calledPeers.has(member.userId)) {
                     const call = this.calledPeers.get(member.userId);
                     this._hangUpPeer(member.userId, call);
