@@ -96,6 +96,9 @@ export default class FullMeshConference extends EventEmitter {
 
         // add new peers to peersToCall
         peers.reduce((acc, peer) => {
+            if (!peer.match(/mxvr[0-9]+/)) {
+                return acc;
+            }
             if (!this.peersToCall.has(peer) && !this.calledPeers.has(peer)) {
                 return acc.add(peer);
             }
