@@ -18,7 +18,9 @@ limitations under the License.
 import {default as dispatcher} from '../../common/dispatcher';
 import React from 'react';
 import {Entity} from 'aframe-react';
+import 'aframe-html-shader';
 import CallView from './CallView';
+import ImageView from './ImageView';
 import FullMeshConference from '../structures/FullMeshConference';
 
 const PLANE_WIDTH = 1;
@@ -42,13 +44,19 @@ export default class ConferenceView extends React.Component {
 
         this.state = {
             calls: props.conference.getParticipantCalls(),
+            images: [],
+            messages: [],
             useLocalPart: false,
         };
 
+        this._onImage = this._onImage.bind(this);
         this._onKeyEvent = this._onKeyEvent.bind(this);
+        this._onMessage = this._onMessage.bind(this);
         this._participantsChanged = this._participantsChanged.bind(this);
 
+        dispatcher.addListener('image', this._onImage);
         dispatcher.addListener('keyEvent', this._onKeyEvent);
+        dispatcher.addListener('message', this._onMessage);
         props.conference.on('participantsChanged', this._participantsChanged);
 
         this.peerIdToGuest = {};
@@ -61,6 +69,22 @@ export default class ConferenceView extends React.Component {
         });
     }
 
+    _onImage(event) {
+        if (event.roomId === this.props.conference.roomId) {
+            let newImages = this.state.images.slice(0);
+            if (newImages.length === 9) {
+                newImages = newImages.slice(1, 9);
+            }
+            newImages.push({
+                imageUrl: event.content.httpUrl,
+                timestamp: Date.now(),
+            });
+            this.setState({
+                images: newImages,
+            });
+        }
+    }
+
     _onKeyEvent(key) {
         if (key === 'g') {
             this.setState({
@@ -69,18 +93,38 @@ export default class ConferenceView extends React.Component {
         }
     }
 
+    _onMessage(event) {
+        if (event.roomId === this.props.conference.roomId) {
+            let newMessages = this.state.messages.slice(0);
+            if (newMessages.length === 10) {
+                newMessages = newMessages.slice(1, 10);
+            }
+            newMessages.push({
+                message: event.content.body,
+                sender: event.userId,
+                timestamp: Date.now(),
+            });
+            this.setState({
+                messages: newMessages,
+            });
+        }
+    }
+
     componentWillUnmount() {
         this.props.conference.removeListener('participantsChanged',
             this._participantsChanged);
         dispatcher.removeListener('keyEvent', this._onKeyEvent);
+        dispatcher.removeListener('image', this._onImage);
+        dispatcher.removeListener('message', this._onMessage);
     }
 
     render() {
         const calls = this.state.calls.filter((call) => call.active);
-        let callViews = [];
-        if (calls.length) {
-            let modRemainder = calls.length + 1;
-            callViews = calls.map((call, index) => {
+        let mediaViews = [];
+        if (calls.length + this.state.images.length > 0) {
+            const callViewCount = calls.length + (calls.length > 0 ? 1 : 0);
+            let modRemainder = callViewCount + this.state.images.length;
+            mediaViews = calls.map((call, index) => {
                 if (index && index % ROW_LENGTH === 0) {
                     modRemainder -= ROW_LENGTH;
                 }
@@ -115,34 +159,68 @@ export default class ConferenceView extends React.Component {
                 );
             });
 
-
-            if (calls.length % ROW_LENGTH === 0) {
-                modRemainder -= ROW_LENGTH;
-            }
-            const angle = indexToAngle(
-                modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
-                calls.length % ROW_LENGTH, this.props.fov, this.props.radius,
-            );
-            const planeYPos = PLANE_HEIGHT_FROM_GROUND +
+            if (calls.length > 0) {
+                if (calls.length % ROW_LENGTH === 0) {
+                    modRemainder -= ROW_LENGTH;
+                }
+                const angle = indexToAngle(
+                    modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
+                    calls.length % ROW_LENGTH, this.props.fov, this.props.radius,
+                );
+                const planeYPos = PLANE_HEIGHT_FROM_GROUND +
                 Math.floor(calls.length / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
-            callViews.push(<CallView
-                key={`local-${calls[0].id}`}
-                showLocal={true}
-                call={calls[0]}
-                width={PLANE_WIDTH}
-                height={PLANE_HEIGHT}
-                position={[0, planeYPos, -this.props.radius]}
-                rotation={[0, angle, 0]}
-                faceCamera={false}
-                text={this.state.useLocalPart ? this.props.conference.client.username : 'You'} />);
+                mediaViews.push(<CallView
+                    key={`local-${calls[0].id}`}
+                    showLocal={true}
+                    call={calls[0]}
+                    width={PLANE_WIDTH}
+                    height={PLANE_HEIGHT}
+                    position={[0, planeYPos, -this.props.radius]}
+                    rotation={[0, angle, 0]}
+                    faceCamera={false}
+                    text={this.state.useLocalPart ? this.props.conference.client.username : 'You'} />);
+            }
+
+            this.state.images.reverse().map((image, imageIndex) => {
+                const index = callViewCount + imageIndex;
+                if (index && index % ROW_LENGTH === 0) {
+                    modRemainder -= ROW_LENGTH;
+                }
+                const angle = indexToAngle(
+                    modRemainder > ROW_LENGTH ? ROW_LENGTH : modRemainder,
+                    index % ROW_LENGTH, this.props.fov, this.props.radius,
+                );
+
+                const planeYPos = PLANE_HEIGHT_FROM_GROUND +
+                    Math.floor(index / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
+                mediaViews.push(<ImageView
+                    key={image.imageUrl + image.timestamp}
+                    src={image.imageUrl}
+                    width={PLANE_WIDTH}
+                    height={PLANE_HEIGHT}
+                    position={[0, planeYPos, -this.props.radius]}
+                    rotation={[0, angle, 0]}
+                    faceCamera={false} />);
+            });
         }
+
         console.warn('Rendering ConferenceView');
 
         const tableYPos = PLANE_HEIGHT_FROM_GROUND - (PLANE_SPACING + 0.5 * PLANE_HEIGHT);
 
+        const messages = this.state.messages.map((message, index) => {
+            const displayName = this.props.conference.client.getDisplayNameForUser(message.sender);
+            return <p className='message' key={message.message + message.timestamp}><b>{displayName}</b>: {message.message}</p>;
+        });
+        // FIXME: We have to wait for the render updates of the messages to have been written to the DOM before doing this.
+        setTimeout(() => {
+            const el = document.getElementById('oneToOneMessages');
+            el.scrollTop = el.scrollHeight;
+        }, 100);
+
         return (
             <Entity position={this.props.position}>
-                {callViews}
+                {mediaViews}
                 {this.props.showTable &&
                     <a-circle
                         radius={this.props.radius}
@@ -155,12 +233,21 @@ export default class ConferenceView extends React.Component {
                             <a-text
                                 value={this.props.conference.roomAlias}
                                 width={this.props.radius}
-                                position={[0, 0.56 * this.props.radius, 0].join(' ')}
-                                color='#ffffff'
+                                position={[0, this.props.radius * 2.0 / 3.0, 0.04].join(' ')}
+                                rotation='90 0 0'
+                                color='#ccc'
                                 align='center'></a-text>
                         }
                     </a-circle>
                 }
+                <div className='oneToOneMessages' id='oneToOneMessages'>
+                    {messages}
+                </div>
+                <a-entity
+                    geometry='primitive: plane; width: 0.8; height: 0.225;'
+                    position={[0, 0.03, -0.54 * this.props.radius].join(' ')}
+                    rotation='-90 0 0'
+                    material='shader: html; target: #oneToOneMessages; transparent: true; fps: 1.5;'></a-entity>
             </Entity>
         );
     }
