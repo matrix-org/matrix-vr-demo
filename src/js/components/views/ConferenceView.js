@@ -156,7 +156,7 @@ export default class ConferenceView extends React.Component {
         const tableYPos = PLANE_HEIGHT_FROM_GROUND - (PLANE_SPACING + 0.5 * PLANE_HEIGHT);
 
         const messages = this.state.messages.map((message, index) => {
-            return <p className='message'>{message}</p>;
+            return <p className='message' key={message}>{message}</p>;
         });
         // FIXME: We have to wait for the render updates of the messages to have been written to the DOM before doing this.
         setTimeout(() => {
