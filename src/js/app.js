@@ -305,19 +305,18 @@ function finalClientInit(options) {
     ReactDOM.render(<VRScene client={client} />, sceneContainer);
 
     client.on('message', (event) => {
-        if (event.userId === client.peerId) {
-            switch (event.content.msgtype) {
-                case 'm.text':
-                    if (event.content.body.length > 1) {
-                        dispatcher.emit('message', event.content.body);
-                    }
-                    break;
-                case 'm.image':
-                    if (event.content.url) {
-                        dispatcher.emit('image', client.mxcUrlToHttp(event.content.url));
-                    }
-                    break;
-            }
+        switch (event.content.msgtype) {
+            case 'm.text':
+                if (event.content.body.length > 1) {
+                    dispatcher.emit('message', event);
+                }
+                break;
+            case 'm.image':
+                if (event.content.url) {
+                    event.content.httpUrl = client.mxcUrlToHttp(event.content.url);
+                    dispatcher.emit('image', event);
+                }
+                break;
         }
     });
 

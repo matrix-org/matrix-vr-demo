@@ -69,15 +69,20 @@ export default class ConferenceView extends React.Component {
         });
     }
 
-    _onImage(image) {
-        let newImages = this.state.images.slice(0);
-        if (newImages.length === 9) {
-            newImages = newImages.slice(0, 8);
+    _onImage(event) {
+        if (event.roomId === this.props.conference.roomId) {
+            let newImages = this.state.images.slice(0);
+            if (newImages.length === 9) {
+                newImages = newImages.slice(1, 9);
+            }
+            newImages.push({
+                imageUrl: event.content.httpUrl,
+                timestamp: Date.now(),
+            });
+            this.setState({
+                images: newImages,
+            });
         }
-        newImages.prepend(image);
-        this.setState({
-            images: newImages,
-        });
     }
 
     _onKeyEvent(key) {
@@ -88,15 +93,21 @@ export default class ConferenceView extends React.Component {
         }
     }
 
-    _onMessage(message) {
-        let newMessages = this.state.messages.slice(0);
-        if (newMessages.length === 10) {
-            newMessages = newMessages.slice(1, 10);
+    _onMessage(event) {
+        if (event.roomId === this.props.conference.roomId) {
+            let newMessages = this.state.messages.slice(0);
+            if (newMessages.length === 10) {
+                newMessages = newMessages.slice(1, 10);
+            }
+            newMessages.push({
+                message: event.content.body,
+                sender: event.userId,
+                timestamp: Date.now(),
+            });
+            this.setState({
+                messages: newMessages,
+            });
         }
-        newMessages.push(message);
-        this.setState({
-            messages: newMessages,
-        });
     }
 
     componentWillUnmount() {
@@ -183,8 +194,8 @@ export default class ConferenceView extends React.Component {
                 const planeYPos = PLANE_HEIGHT_FROM_GROUND +
                     Math.floor(index / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
                 mediaViews.push(<ImageView
-                    key={image}
-                    src={image}
+                    key={image.imageUrl + image.timestamp}
+                    src={image.imageUrl}
                     width={PLANE_WIDTH}
                     height={PLANE_HEIGHT}
                     position={[0, planeYPos, -this.props.radius]}
@@ -198,7 +209,7 @@ export default class ConferenceView extends React.Component {
         const tableYPos = PLANE_HEIGHT_FROM_GROUND - (PLANE_SPACING + 0.5 * PLANE_HEIGHT);
 
         const messages = this.state.messages.map((message, index) => {
-            return <p className='message' key={message}>{message}</p>;
+            return <p className='message' key={message.message + message.timestamp}>{message.message}</p>;
         });
         // FIXME: We have to wait for the render updates of the messages to have been written to the DOM before doing this.
         setTimeout(() => {
