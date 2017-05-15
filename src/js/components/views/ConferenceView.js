@@ -233,7 +233,8 @@ export default class ConferenceView extends React.Component {
                             <a-text
                                 value={this.props.conference.roomAlias}
                                 width={this.props.radius}
-                                position={[0, 0.5 * this.props.radius, 0].join(' ')}
+                                position={[0, this.props.radius * 2.0 / 3.0, 0.04].join(' ')}
+                                rotation='90 0 0'
                                 color='#ccc'
                                 align='center'></a-text>
                         }
@@ -244,7 +245,8 @@ export default class ConferenceView extends React.Component {
                 </div>
                 <a-entity
                     geometry='primitive: plane; width: 0.8; height: 0.225;'
-                    position={[0, 0.17, -0.5 * this.props.radius].join(' ')}
+                    position={[0, 0.03, -0.54 * this.props.radius].join(' ')}
+                    rotation='-90 0 0'
                     material='shader: html; target: #oneToOneMessages; transparent: true; fps: 1.5;'></a-entity>
             </Entity>
         );
