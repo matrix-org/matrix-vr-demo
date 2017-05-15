@@ -181,7 +181,7 @@ export default class ConferenceView extends React.Component {
                     text={this.state.useLocalPart ? this.props.conference.client.username : 'You'} />);
             }
 
-            this.state.images.map((image, imageIndex) => {
+            this.state.images.reverse().map((image, imageIndex) => {
                 const index = callViewCount + imageIndex;
                 if (index && index % ROW_LENGTH === 0) {
                     modRemainder -= ROW_LENGTH;
