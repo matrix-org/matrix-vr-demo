@@ -128,7 +128,7 @@ export default class ConferenceView extends React.Component {
             medias = [].concat(medias, calls);
         }
         if (this.state.images.length > 0) {
-            medias = [].concat(medias, this.state.images.reverse());
+            medias = [].concat(medias, this.state.images.slice().reverse());
         }
         const mediaViews = [];
 
