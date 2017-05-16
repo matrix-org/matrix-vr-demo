@@ -178,8 +178,11 @@ div.oneToOneMessages {
     overflow: hidden!important;
     word-wrap: break-word;
     width: 1280px;
-    height: 360px;
+    height: 720px;
     z-index: -1;
+    opacity: 0.9;
+    background-color: #222222;
+    padding: 32px;
 }
 
 p.message {
