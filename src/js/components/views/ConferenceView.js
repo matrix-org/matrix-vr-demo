@@ -132,10 +132,11 @@ export default class ConferenceView extends React.Component {
         }
         const mediaViews = [];
 
-        // possibly add 1 for the self-view
-        const callViewCount = calls.length + (calls.length > 0 ? 1 : 0);
         // 1 + because of the messagePane
-        let modRemainder = 1 + callViewCount + this.state.images.length;
+        let modRemainder = 1 + medias.length;
+        if (modRemainder < ROW_LENGTH) {
+            modRemainder = ROW_LENGTH;
+        }
 
         // Always place the message pane in the center of the bottom row
         const messagePane = <a-entity
@@ -149,7 +150,8 @@ export default class ConferenceView extends React.Component {
         if (medias.length === 0) {
             mediaViews.push(messagePane);
         } else {
-            for (let index = 0; medias.length > 0; index++) {
+            let messagePaneRendered = false;
+            for (let index = 0; medias.length > 0 || !messagePaneRendered; index++) {
                 if (index && index % ROW_LENGTH === 0) {
                     modRemainder -= ROW_LENGTH;
                 }
@@ -178,6 +180,7 @@ export default class ConferenceView extends React.Component {
 
                 if (index === 1) {
                     mediaViews.push(messagePane);
+                    messagePaneRendered = true;
                     continue;
                 }
 
