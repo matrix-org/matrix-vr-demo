@@ -132,8 +132,8 @@ export default class ConferenceView extends React.Component {
         }
         const mediaViews = [];
 
-        // 1 + because of the messagePane
-        let modRemainder = 1 + medias.length;
+        // 1 + because of the messagePane and possibly + 1 for self-view
+        let modRemainder = 1 + medias.length + (calls.length > 0 ? 1 : 0);
         if (modRemainder < ROW_LENGTH) {
             modRemainder = ROW_LENGTH;
         }
@@ -164,7 +164,7 @@ export default class ConferenceView extends React.Component {
                     Math.floor(index / ROW_LENGTH) * (PLANE_SPACING + PLANE_HEIGHT);
 
                 if (index === 0 && calls.length > 0) {
-                    // Always place the self-view in the bottom-left
+                    // Always place the self-view in the bottom-right
                     mediaViews.push(<CallView
                         key={`local-${calls[0].id}`}
                         showLocal={true}
@@ -184,7 +184,7 @@ export default class ConferenceView extends React.Component {
                     continue;
                 }
 
-                // medias is an array of Calls and image URIs in string form
+                // medias is an array of Calls and Objects containing image URIs in string form
                 const media = medias.shift();
                 if (media instanceof Call) {
                     const localpart = media.peerId.match(/@([a-zA-Z0-9_-]+):.*/)[1];
