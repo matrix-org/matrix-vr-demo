@@ -73,7 +73,7 @@ export default class ImageView extends React.Component {
                 'height': this.state.height,
                 'scale': '0 0 0',
                 'position': this.props.position.join(' '),
-                'material': 'shader: flat; side: double',
+                'material': 'shader: flat; side: double; transparent: true;',
                 'look-at': this.props.faceCamera ? '[camera]' : null,
                 'src': `#${this.state.image.id}`,
             };
