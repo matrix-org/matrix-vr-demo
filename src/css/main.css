@@ -177,14 +177,14 @@ a:visited {
 div.oneToOneMessages {
     overflow: hidden!important;
     word-wrap: break-word;
-    width: 1280px;
-    height: 360px;
+    width: 1200px;
+    height: 450px;
     z-index: -1;
 }
 
 p.message {
     color: #ffffff;
-    font-size: 56px;
+    font-size: 72px;
     margin: 0px;
     width: 100%;
 }

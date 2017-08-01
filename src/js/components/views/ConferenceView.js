@@ -181,7 +181,7 @@ export default class ConferenceView extends React.Component {
                     text={this.state.useLocalPart ? this.props.conference.client.username : 'You'} />);
             }
 
-            this.state.images.reverse().map((image, imageIndex) => {
+            this.state.images.slice().reverse().map((image, imageIndex) => {
                 const index = callViewCount + imageIndex;
                 if (index && index % ROW_LENGTH === 0) {
                     modRemainder -= ROW_LENGTH;
@@ -227,13 +227,16 @@ export default class ConferenceView extends React.Component {
                         position={[0, tableYPos, 0].join(' ')}
                         rotation='-90 0 0'
                         color='#444'
-                        opacity='0.75'>
+                        opacity='0.85'
+                        metalness='0.75'
+                        roughness='0.8'
+                        material='shader: standard'>
                         {this.props.conference.roomAlias &&
                                 this.props.conference.roomAlias.length > 0 &&
                             <a-text
                                 value={this.props.conference.roomAlias}
                                 width={this.props.radius}
-                                position={[0, this.props.radius * 2.0 / 3.0, 0.04].join(' ')}
+                                position={[0, this.props.radius * 0.8, 0.04].join(' ')}
                                 rotation='90 0 0'
                                 color='#ccc'
                                 align='center'></a-text>
@@ -243,11 +246,13 @@ export default class ConferenceView extends React.Component {
                 <div className='oneToOneMessages' id='oneToOneMessages'>
                     {messages}
                 </div>
-                <a-entity
-                    geometry='primitive: plane; width: 0.8; height: 0.225;'
-                    position={[0, 0.03, -0.54 * this.props.radius].join(' ')}
-                    rotation='-90 0 0'
-                    material='shader: html; target: #oneToOneMessages; transparent: true; fps: 1.5;'></a-entity>
+                {this.state.messages.length > 0 &&
+                    <a-entity
+                        geometry='primitive: plane; width: 1.2; height: 0.45;'
+                        position={[0, 0.03, -0.61 * this.props.radius].join(' ')}
+                        rotation='-90 0 0'
+                        material='shader: html; target: #oneToOneMessages; transparent: true; fps: 1.5;'></a-entity>
+                }
             </Entity>
         );
     }

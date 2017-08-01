@@ -29,7 +29,7 @@ export default class Client extends EventEmitter {
         options = options || {};
         // FIXME - validate
         if (options.guest) {
-            this.homeserver = 'https://conf.matrix.org:8448';
+            this.homeserver = 'https://conf.matrix.org';
             this.guest = true;
         } else {
             this.username = options.username || '';
