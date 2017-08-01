@@ -25,7 +25,7 @@ const localStorage = window.localStorage;
 
 const USERNAME_REGEX = /@(.+):(.+)/;
 const ROOM_ALIAS_REGEX = /#\/room\/(#[^:]+:[^?]+)/;
-const CONF_HOME_SERVER = 'https://conf.matrix.org:8448';
+const CONF_HOME_SERVER = 'https://conf.matrix.org';
 
 function postAlert(message) {
     const msg = 'ERROR: ' + message;
