@@ -293,7 +293,7 @@ function switchScene(key, client) {
     }
 }
 
-const CONF_HOME_SERVER = 'https://conf.matrix.org:8448';
+const CONF_HOME_SERVER = 'https://conf.matrix.org';
 const VC_ROOM_NAME = 'Matrix VR Demo';
 
 let keyHandler;
