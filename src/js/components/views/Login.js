@@ -150,6 +150,11 @@ export default class Login extends React.Component {
 
     componentDidMount() {
         window.addEventListener('hashchange', this._onHashChange);
+        setTimeout(() => {
+            if (getParameterByName('autoLogin') === 'true') {
+                this.onSubmitForm();
+            }
+        }, 0);
     }
 
     componentWillUnmount() {
@@ -180,7 +185,9 @@ export default class Login extends React.Component {
     }
 
     onSubmitForm(event) {
-        event.preventDefault();
+        if (event) {
+            event.preventDefault();
+        }
 
         // note: password or access token set below
         const formData = {};
