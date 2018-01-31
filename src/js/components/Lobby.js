@@ -195,12 +195,12 @@ export default class Lobby extends React.Component {
                 { this.props.room === 'lobby' && this.props.call && !this.state.ringbackVisible && (
                     <CallView
                         call={this.props.call}
-                        width={1.6}
-                        height={0.9}
+                        width={1}
+                        height={1.3333}
                         position={videoPos}
                         rotation={videoRot}
-                        opacity={0.8}
-                        faceCamera={true}
+                        opacity={1}
+                        faceCamera={false}
                     />
                 )}
 

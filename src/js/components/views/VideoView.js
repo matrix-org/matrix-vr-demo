@@ -34,6 +34,8 @@ export default class VideoView extends React.Component {
             const float w = 65536.0;
             const float p = np / w;
 
+            const float maxDepth = 2048.0;
+
             int m(in float L) {
                 return int(mod(floor((4.0 * (L / p)) - 0.5), 4.0));
             }
@@ -56,30 +58,39 @@ export default class VideoView extends React.Component {
             }
 
             float d(float L, float Ha, float Hb) {
-                return w * (lzero(L) + delta(L, Ha, Hb));
+                // for now, just consider the L channel and ignore the deltas.
+                return maxDepth - (maxDepth * L);
+
+                //return maxDepth - (maxDepth * (lzero(L) + delta(L, Ha, Hb)));
+
+                // // convert from a uint16-cast-of-a-half into a float
+                // int d = int(w * (lzero(L) + delta(L, Ha, Hb)));
+                // // stolen from https://stackoverflow.com/a/26779139/6764493
+                // return float( ((d&0x8000)<<16) | (((d&0x7c00)+0x1C000)<<13) | ((d&0x03FF)<<13) );
             }
 
             void main() {
-                vUv = vec2(position.x / 854.0, position.y / 480.0);
+                vUv = vec2(position.x / 640.0, position.y / 480.0);
 
                 vec4 color = texture2D(tex1, vUv);
-                //float depth = ( color.r + color.g + color.b ) * 50.0;// / 3.0;
-                outDepth = d((color.b + 0.3) / 4.0, color.g, color.r);
-                //float depth = d(color.b, color.g, color.r);
+                
+                outDepth = d((1.0 - color.b), color.g, color.r);
+                //outDepth = d((color.b + 0.3) / 4.0, color.g, color.r);
 
                 //noise = 10.0 *  -.10 * turbulence( .5 * normal + time / 3.0 );
                 //float b = 5.0 * pnoise3( 0.05 * position, vec3( 100.0 ) );
                 //float displacement = mod(time, 2.0);//(- 10. * noise + b) / 50.0;
                
                 //vec3 newPosition = position + normal;// * depth;
-                vec3 newPosition = ( position + vec3(-427, -240, outDepth / 32.0) ) * vec3(0.002, 0.002, 0.002);
+                vec3 newPosition = ( position + vec3(-427, -240, outDepth) ) * vec3(0.002, 0.002, 0.002);
                 gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
                 gl_PointSize = 1.5;
             }
         `;
 
         this.fragmentShader = `
-            const float w = 65536.0;
+            const float maxDepth = 2048.0;
+            const float backDepth = 10.0;
 
             uniform sampler2D tex1;
             varying vec2 vUv;
@@ -89,7 +100,7 @@ export default class VideoView extends React.Component {
                 //vec3 color = vec3(1. - 2.);
                 //vec3 color = vec3(1.);
                 //gl_FragColor = vec4( color.rgb, 1.0 );
-                gl_FragColor = vec4( 0.0, outDepth / w, 0.0, 1.0 );
+                gl_FragColor = vec4( 0.0, outDepth / maxDepth, 0.0, outDepth < backDepth ? 0.0 : 1.0 );
             }
         `;
     }
@@ -115,7 +126,7 @@ export default class VideoView extends React.Component {
 
             init: function() {
                 this.geometry = new THREE.Geometry();
-                for (let x = 0; x < 854; ++x) {
+                for (let x = 0; x < 640; ++x) {
                     for (let y = 0; y < 480; ++y) {
                         this.geometry.vertices.push(new THREE.Vector3(x, y, 0));
                     }
@@ -233,14 +244,14 @@ export default class VideoView extends React.Component {
 }
 
 VideoView.defaultProps = {
-    faceCamera: true,
-    height: 0.9,
+    faceCamera: false,
+    height: 1,
     hasVideo: true,
     opacity: 1.0,
     position: [0, 0, -2],
     rotation: [0, 0, 0],
     text: '',
-    width: 1.6,
+    width: 1.3333,
 };
 
 VideoView.propTypes = {
