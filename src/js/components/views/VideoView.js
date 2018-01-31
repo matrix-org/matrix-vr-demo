@@ -28,6 +28,7 @@ export default class VideoView extends React.Component {
             uniform float time;
             uniform sampler2D tex1;
             varying vec2 vUv;
+            varying float outDepth;
 
             const float np = 512.0;
             const float w = 65536.0;
@@ -55,7 +56,7 @@ export default class VideoView extends React.Component {
             }
 
             float d(float L, float Ha, float Hb) {
-                return 100.0 * (lzero(L) + delta(L, Ha, Hb));
+                return w * (lzero(L) + delta(L, Ha, Hb));
             }
 
             void main() {
@@ -63,28 +64,32 @@ export default class VideoView extends React.Component {
 
                 vec4 color = texture2D(tex1, vUv);
                 //float depth = ( color.r + color.g + color.b ) * 50.0;// / 3.0;
-                float depth = d(color.b, color.g, color.r);
+                outDepth = d((color.b + 0.3) / 4.0, color.g, color.r);
+                //float depth = d(color.b, color.g, color.r);
 
                 //noise = 10.0 *  -.10 * turbulence( .5 * normal + time / 3.0 );
                 //float b = 5.0 * pnoise3( 0.05 * position, vec3( 100.0 ) );
                 //float displacement = mod(time, 2.0);//(- 10. * noise + b) / 50.0;
                
                 //vec3 newPosition = position + normal;// * depth;
-                vec3 newPosition = ( position + vec3(-427, -240, depth) ) * vec3(0.002, 0.002, 0.002);
+                vec3 newPosition = ( position + vec3(-427, -240, outDepth / 32.0) ) * vec3(0.002, 0.002, 0.002);
                 gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
                 gl_PointSize = 1.5;
             }
         `;
 
         this.fragmentShader = `
+            const float w = 65536.0;
+
             uniform sampler2D tex1;
             varying vec2 vUv;
+            varying float outDepth;
             void main() {
                 //gl_FragColor = texture2D(tex1, vUv);
                 //vec3 color = vec3(1. - 2.);
                 //vec3 color = vec3(1.);
                 //gl_FragColor = vec4( color.rgb, 1.0 );
-                gl_FragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+                gl_FragColor = vec4( 0.0, outDepth / w, 0.0, 1.0 );
             }
         `;
     }
@@ -117,8 +122,7 @@ export default class VideoView extends React.Component {
                 }
 
 
-                const videoEl = document.getElementById(this.data.src);
-                const tex = new THREE.VideoTexture(/*document.getElementById(this.data.src)*/videoEl);
+                const tex = new THREE.VideoTexture(document.getElementById(this.data.src));
                 tex.minFilter = THREE.LinearFilter;
                 tex.magFilter = THREE.LinearFilter;
                 tex.format = THREE.RGBFormat;
@@ -197,7 +201,7 @@ export default class VideoView extends React.Component {
             //'height': this.props.height,
             'scale': '0 0 0',
             'position': this.props.position.join(' '),
-            'look-at': this.props.faceCamera ? '[camera]' : null,
+            //'look-at': this.props.faceCamera ? '[camera]' : null,
         };
 
         if (this.props.hasVideo) {
