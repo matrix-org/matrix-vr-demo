@@ -15,7 +15,7 @@
     "babel-polyfill": "^6.23.0",
     "headtrackr": "0.0.1",
     "lodash": "^4.17.4",
-    "matrix-js-sdk": "matrix-org/matrix-js-sdk#a3c7e061ea6505a32f130413048392ac3ef2a6c9",
+    "matrix-js-sdk": "matrix-org/matrix-js-sdk#f3f1524fcd46d2e772fd5cd022364018c8889364",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-loader": "^2.4.0",
