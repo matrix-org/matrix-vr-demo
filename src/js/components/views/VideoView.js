@@ -26,7 +26,7 @@ export default class VideoView extends React.Component {
 
         this.vertexShader = `
             uniform float time;
-            uniform sampler2D tex1;
+            uniform sampler2D depthTex;
             varying vec2 vUv;
             varying float outDepth;
 
@@ -59,7 +59,8 @@ export default class VideoView extends React.Component {
 
             float d(float L, float Ha, float Hb) {
                 // for now, just consider the L channel and ignore the deltas.
-                return maxDepth - (maxDepth * L);
+                return L;
+                //return maxDepth - (maxDepth * L);
 
                 //return maxDepth - (maxDepth * (lzero(L) + delta(L, Ha, Hb)));
 
@@ -70,11 +71,12 @@ export default class VideoView extends React.Component {
             }
 
             void main() {
-                vUv = vec2(position.x / 640.0, position.y / 480.0);
+                //vUv = vec2(position.x / 640.0, position.y / 480.0);
+                vUv = vec2(position.x + 0.5, (position.y * 0.75) + 0.5);
 
-                vec4 color = texture2D(tex1, vUv);
+                vec4 color = texture2D(depthTex, vUv);
                 
-                outDepth = d((1.0 - color.b), color.g, color.r);
+                outDepth = d((/*1.0 - */color.b), color.g, color.r);
                 //outDepth = d((color.b + 0.3) / 4.0, color.g, color.r);
 
                 //noise = 10.0 *  -.10 * turbulence( .5 * normal + time / 3.0 );
@@ -82,17 +84,18 @@ export default class VideoView extends React.Component {
                 //float displacement = mod(time, 2.0);//(- 10. * noise + b) / 50.0;
                
                 //vec3 newPosition = position + normal;// * depth;
-                vec3 newPosition = ( position + vec3(-427, -240, outDepth) ) * vec3(0.002, 0.002, 0.002);
+                //vec3 newPosition = ( position + vec3(-427, -240, outDepth) );// * vec3(0.002, 0.002, 0.002);
+                vec3 newPosition = ( position + vec3(0.0, 0.0, outDepth) );// * vec3(0.002, 0.002, 0.002);
                 gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
-                gl_PointSize = 1.5;
+                //gl_PointSize = 1.5;
             }
         `;
 
         this.fragmentShader = `
             const float maxDepth = 1400.0;
-            const float backDepth = 320.0;
+            const float backDepth = 0.7;
 
-            uniform sampler2D tex2;
+            uniform sampler2D videoTex;
             varying vec2 vUv;
             varying float outDepth;
 
@@ -100,11 +103,12 @@ export default class VideoView extends React.Component {
                 //gl_FragColor = texture2D(tex1, vUv);
                 //vec3 color = vec3(1. - 2.);
                 //vec3 color = vec3(1.);
-                
-                vec4 videoColor = texture2D(tex2, vUv);
-                gl_FragColor = vec4( videoColor.rgb, 1 );
 
-                if (outDepth < backDepth) discard;
+                vec4 videoColor = texture2D(videoTex, vUv);
+                gl_FragColor = vec4( videoColor.rgb, 1 );
+                ////gl_FragColor = vec4( 1.0, 0.0, 0.0, 1 );
+
+                if (outDepth > backDepth) discard;
 
                 //gl_FragColor = vec4( 0.0, outDepth / maxDepth, 0.0, outDepth < backDepth ? 0.0 : 1.0 );
             }
@@ -123,69 +127,48 @@ export default class VideoView extends React.Component {
         const self = this;
 
         
-        AFRAME.registerComponent('videocloud', {
+        AFRAME.registerComponent('videocloud-material', {
             schema: {
-                video: {
+                videotex: {
                     type: 'string',
                 },
-                depth: {
+                depthtex: {
                     type: 'string',
                 },
             },
 
             init: function() {
-                this.geometry = new THREE.Geometry();
-                for (let x = 0; x < 640; ++x) {
-                    for (let y = 0; y < 480; ++y) {
-                        this.geometry.vertices.push(new THREE.Vector3(x, y, 0));
-                    }
-                }
-
-
-                const depthTex = new THREE.VideoTexture(document.getElementById(this.data.depth));
+                const depthTex = new THREE.VideoTexture(document.getElementById(this.data.depthtex));
                 depthTex.minFilter = THREE.LinearFilter;
                 depthTex.magFilter = THREE.LinearFilter;
                 depthTex.format = THREE.RGBFormat;
 
-                const videoTex = new THREE.VideoTexture(document.getElementById(this.data.video));
+                const videoTex = new THREE.VideoTexture(document.getElementById(this.data.videotex));
                 videoTex.minFilter = THREE.LinearFilter;
                 videoTex.magFilter = THREE.LinearFilter;
                 videoTex.format = THREE.RGBFormat;
 
                 this.material = new THREE.ShaderMaterial({
                     uniforms: {
-                        tex1: {
-                            type: 't',
+                        depthTex: {
                             value: depthTex,
                         },
-                        tex2: {
-                            type: 't',
+                        videoTex: {
                             value: videoTex,
                         },
                     },
                     vertexShader: self.vertexShader,
                     fragmentShader: self.fragmentShader,
                 });
-
-                /*this.material = new THREE.PointsMaterial({
-                  color: '#f00',
-                  size: 1.0,
-                  sizeAttenuation: false,
-                });*/
-
-
-                this.points = new THREE.Points(this.geometry, this.material);
-                this.el.setObject3D('mesh', this.points);
+                this.applyToMesh();
+                this.el.addEventListener('model-loaded', () => this.applyToMesh());
             },
-        });
 
-        AFRAME.registerPrimitive('a-videomesh', {
-            defaultComponents: {
-                videocloud: {},
-            },
-            mappings: {
-                video: 'videocloud.video',
-                depth: 'videocloud.depth',
+            applyToMesh: function() {
+                const mesh = this.el.getObject3D('mesh');
+                if (mesh) {
+                    mesh.material = this.material;
+                }
             },
         });
     }
@@ -227,21 +210,28 @@ export default class VideoView extends React.Component {
         }
 
         const videoPlaneProps = {
-            //'width': this.props.width,
-            //'height': this.props.height,
+            'width': this.props.width,
+            'height': this.props.height,
             'scale': '0 0 0',
             'position': this.props.position.join(' '),
             //'look-at': this.props.faceCamera ? '[camera]' : null,
         };
 
         if (this.props.hasVideo) {
-            videoPlaneProps.video = this.props.video;
-            videoPlaneProps.depth = this.props.depth ? this.props.depth : this.props.video;
+            //videoPlaneProps.video = this.props.video;
+            //videoPlaneProps.depth = this.props.depth ? this.props.depth : this.props.video;
+
+            let materialProps = 'videotex: ' + this.props.video;
+            if (this.props.depth) materialProps += '; depthtex: ' + this.props.depth;
+
+            videoPlaneProps['videocloud-material'] = materialProps;
+            videoPlaneProps['segments-width'] = 480;
+            videoPlaneProps['segments-height'] = 640;
         } else {
             videoPlaneProps.color = '#444';
         }
 
-        const videoPlane = <a-videomesh {...videoPlaneProps} >
+        const videoPlane = <a-plane {...videoPlaneProps} >
             <a-animation
                 attribute='opacity'
                 dur='500'
@@ -253,7 +243,7 @@ export default class VideoView extends React.Component {
                 from='0 0 0'
                 to='1 1 1'></a-animation>
             {text}
-        </a-videomesh>;
+        </a-plane>;
 
         return (
             <Entity rotation={this.props.rotation}>
