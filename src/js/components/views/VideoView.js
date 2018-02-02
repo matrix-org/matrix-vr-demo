@@ -34,7 +34,7 @@ export default class VideoView extends React.Component {
             const float w = 65536.0;
             const float p = np / w;
 
-            const float maxDepth = 2048.0;
+            const float maxDepth = 1400.0;
 
             int m(in float L) {
                 return int(mod(floor((4.0 * (L / p)) - 0.5), 4.0));
@@ -89,8 +89,8 @@ export default class VideoView extends React.Component {
         `;
 
         this.fragmentShader = `
-            const float maxDepth = 2048.0;
-            const float backDepth = 512.0;
+            const float maxDepth = 1400.0;
+            const float backDepth = 320.0;
 
             uniform sampler2D tex2;
             varying vec2 vUv;
