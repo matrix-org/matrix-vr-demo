@@ -94,9 +94,12 @@ export default class VideoView extends React.Component {
         `;
 
         this.fragmentShader = `
+            #extension GL_OES_standard_derivatives : enable
+
             const float maxDepth = 1400.0;
             const float backDepth = 0.1;
 
+            uniform sampler2D depthTex;
             uniform sampler2D videoTex;
             varying vec2 vUv;
             varying float outDepth;
@@ -106,11 +109,26 @@ export default class VideoView extends React.Component {
                 //vec3 color = vec3(1. - 2.);
                 //vec3 color = vec3(1.);
 
+                if (outDepth < backDepth) discard;
+
+                // discard if the gradient of the surface is too steep, to avoid
+                // ugly smearing:
+                // stolen from https://stackoverflow.com/questions/43977910/edge-outline-detection-from-texture-in-fragment-shader
+                // N.B. we can do this much better, as per the stackoverflow answer.
+
+                vec4 depthColor = texture2D(depthTex, vUv);
+                float maxColor = depthColor.b;
+                // consider the variance of the gradient vector; no point wasting time sqrting afterwards.
+                float gradient = 2000.0 * (dFdx(maxColor) * dFdx(maxColor) + dFdy(maxColor) * dFdy(maxColor));
+                if (gradient > 0.5) {
+                    discard;
+                }
+                // gl_FragColor = vec4 ( gradient, gradient, gradient, 1.0 );
+
                 vec4 videoColor = texture2D(videoTex, vUv);
                 gl_FragColor = vec4( videoColor.rgb, 1 );
-                ////gl_FragColor = vec4( 1.0, 0.0, 0.0, 1 );
 
-                if (outDepth < backDepth) discard;
+                ////gl_FragColor = vec4( 1.0, 0.0, 0.0, 1 );
 
                 //gl_FragColor = vec4( 0.0, outDepth / maxDepth, 0.0, outDepth < backDepth ? 0.0 : 1.0 );
             }
