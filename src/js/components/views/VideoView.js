@@ -59,7 +59,7 @@ export default class VideoView extends React.Component {
 
             float d(float L, float Ha, float Hb) {
                 // for now, just consider the L channel and ignore the deltas.
-                return L;
+                return 2.5 * L;
                 //return maxDepth - (maxDepth * L);
 
                 //return maxDepth - (maxDepth * (lzero(L) + delta(L, Ha, Hb)));
@@ -76,7 +76,7 @@ export default class VideoView extends React.Component {
 
                 vec4 color = texture2D(depthTex, vUv);
                 
-                outDepth = d((/*1.0 - */color.b), color.g, color.r);
+                outDepth = d(color.b, color.g, color.r);
                 //outDepth = d((color.b + 0.3) / 4.0, color.g, color.r);
 
                 //noise = 10.0 *  -.10 * turbulence( .5 * normal + time / 3.0 );
@@ -85,7 +85,9 @@ export default class VideoView extends React.Component {
                
                 //vec3 newPosition = position + normal;// * depth;
                 //vec3 newPosition = ( position + vec3(-427, -240, outDepth) );// * vec3(0.002, 0.002, 0.002);
+
                 vec3 newPosition = ( position + vec3(0.0, 0.0, outDepth) );// * vec3(0.002, 0.002, 0.002);
+
                 gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
                 //gl_PointSize = 1.5;
             }
@@ -93,7 +95,7 @@ export default class VideoView extends React.Component {
 
         this.fragmentShader = `
             const float maxDepth = 1400.0;
-            const float backDepth = 0.7;
+            const float backDepth = 0.1;
 
             uniform sampler2D videoTex;
             varying vec2 vUv;
@@ -108,7 +110,7 @@ export default class VideoView extends React.Component {
                 gl_FragColor = vec4( videoColor.rgb, 1 );
                 ////gl_FragColor = vec4( 1.0, 0.0, 0.0, 1 );
 
-                if (outDepth > backDepth) discard;
+                if (outDepth < backDepth) discard;
 
                 //gl_FragColor = vec4( 0.0, outDepth / maxDepth, 0.0, outDepth < backDepth ? 0.0 : 1.0 );
             }
