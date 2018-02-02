@@ -90,17 +90,23 @@ export default class VideoView extends React.Component {
 
         this.fragmentShader = `
             const float maxDepth = 2048.0;
-            const float backDepth = 10.0;
+            const float backDepth = 512.0;
 
-            uniform sampler2D tex1;
+            uniform sampler2D tex2;
             varying vec2 vUv;
             varying float outDepth;
+
             void main() {
                 //gl_FragColor = texture2D(tex1, vUv);
                 //vec3 color = vec3(1. - 2.);
                 //vec3 color = vec3(1.);
-                //gl_FragColor = vec4( color.rgb, 1.0 );
-                gl_FragColor = vec4( 0.0, outDepth / maxDepth, 0.0, outDepth < backDepth ? 0.0 : 1.0 );
+                
+                vec4 videoColor = texture2D(tex2, vUv);
+                gl_FragColor = vec4( videoColor.rgb, 1 );
+
+                if (outDepth < backDepth) discard;
+
+                //gl_FragColor = vec4( 0.0, outDepth / maxDepth, 0.0, outDepth < backDepth ? 0.0 : 1.0 );
             }
         `;
     }
@@ -119,7 +125,10 @@ export default class VideoView extends React.Component {
         
         AFRAME.registerComponent('videocloud', {
             schema: {
-                src: {
+                video: {
+                    type: 'string',
+                },
+                depth: {
                     type: 'string',
                 },
             },
@@ -133,16 +142,25 @@ export default class VideoView extends React.Component {
                 }
 
 
-                const tex = new THREE.VideoTexture(document.getElementById(this.data.src));
-                tex.minFilter = THREE.LinearFilter;
-                tex.magFilter = THREE.LinearFilter;
-                tex.format = THREE.RGBFormat;
+                const depthTex = new THREE.VideoTexture(document.getElementById(this.data.depth));
+                depthTex.minFilter = THREE.LinearFilter;
+                depthTex.magFilter = THREE.LinearFilter;
+                depthTex.format = THREE.RGBFormat;
+
+                const videoTex = new THREE.VideoTexture(document.getElementById(this.data.video));
+                videoTex.minFilter = THREE.LinearFilter;
+                videoTex.magFilter = THREE.LinearFilter;
+                videoTex.format = THREE.RGBFormat;
 
                 this.material = new THREE.ShaderMaterial({
                     uniforms: {
                         tex1: {
                             type: 't',
-                            value: tex,
+                            value: depthTex,
+                        },
+                        tex2: {
+                            type: 't',
+                            value: videoTex,
                         },
                     },
                     vertexShader: self.vertexShader,
@@ -166,7 +184,8 @@ export default class VideoView extends React.Component {
                 videocloud: {},
             },
             mappings: {
-                src: 'videocloud.src',
+                video: 'videocloud.video',
+                depth: 'videocloud.depth',
             },
         });
     }
@@ -216,7 +235,8 @@ export default class VideoView extends React.Component {
         };
 
         if (this.props.hasVideo) {
-            videoPlaneProps.src = this.props.src;
+            videoPlaneProps.video = this.props.video;
+            videoPlaneProps.depth = this.props.depth ? this.props.depth : this.props.video;
         } else {
             videoPlaneProps.color = '#444';
         }

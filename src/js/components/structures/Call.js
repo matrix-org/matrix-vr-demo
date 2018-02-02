@@ -43,6 +43,13 @@ export default class Call extends EventEmitter {
         if (!this.remoteVideo.parentElement) {
             this.parentElement.appendChild(this.remoteVideo);
         }
+
+        this.remoteDepthVideo = options.remoteDepthVideo ||
+            createVideoElement(false, this.id + 'd');
+        if (!this.remoteDepthVideo.parentElement) {
+            this.parentElement.appendChild(this.remoteDepthVideo);
+        }
+
         this.active = this.remoteVideo.videoWidth > 0;
         if (this.active) {
             this.emit('callActive');
@@ -64,6 +71,7 @@ export default class Call extends EventEmitter {
         this.callPeer = this.callPeer.bind(this);
         this.getLocalVideoElement = this.getLocalVideoElement.bind(this);
         this.getRemoteVideoElement = this.getRemoteVideoElement.bind(this);
+        this.getRemoteDepthElement = this.getRemoteDepthElement.bind(this);
         this.hangUp = this.hangUp.bind(this);
 
         if (options.matrixCall) {
@@ -126,6 +134,7 @@ export default class Call extends EventEmitter {
         this._addListeners();
         matrixCall.setLocalVideoElement(this.localVideo);
         matrixCall.setRemoteVideoElement(this.remoteVideo);
+        matrixCall.setRemoteDepthElement(this.remoteDepthVideo);
     }
 
     _callPeer(peer) {
@@ -138,7 +147,7 @@ export default class Call extends EventEmitter {
             this._replacementCall = newCall;
         };
         this.call.on('replaced', onReplaced);
-        this.call.placeVideoCall(this.remoteVideo, this.localVideo);
+        this.call.placeVideoCall(this.remoteVideo, this.localVideo, this.remoteDepthVideo);
         this.call.setRemoteAudioElement(this.remoteVideo);
     }
 
@@ -197,6 +206,10 @@ export default class Call extends EventEmitter {
 
     getRemoteVideoElement() {
         return this.remoteVideo;
+    }
+
+    getRemoteDepthElement() {
+        return this.remoteDepthVideo;
     }
 
     hangUp() {

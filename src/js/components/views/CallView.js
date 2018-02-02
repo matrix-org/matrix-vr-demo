@@ -78,15 +78,18 @@ export default class CallView extends React.Component {
 
     render() {
         let videoElement = null;
+        let videoDepthElement = null;
         if (this.props.call) {
             videoElement = this.props.showLocal ? this.props.call.getLocalVideoElement() :
                     this.props.call.getRemoteVideoElement();
+            videoDepthElement = this.props.showLocal ? null : this.props.call.getRemoteDepthElement();
         }
         return (
             <Entity>
                 {this.state.callActive &&
                     <VideoView
-                        src={videoElement ? videoElement.id : ''}
+                        video={videoElement ? videoElement.id : ''}
+                        depth={videoDepthElement ? videoDepthElement.id : ''}
                         width={this.props.width}
                         height={this.props.height}
                         position={this.props.position}

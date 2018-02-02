@@ -163,13 +163,14 @@ export default class Lobby extends React.Component {
     }
 
     render() {
-        const videoPos = [0, 2.25, -5];
-        const videoRot = [10, 0, 0];
+        const videoPos = [0, 1.75, -5];
+        const videoRot = [0, 0, 0];
         return (
             <Entity events={{
                 loaded: this.onLoaded.bind(this),
             }}>
                 <LobbyLights/>
+
                 <a-collada-model src='#lobby' position='0 0 -6'
                     shader='flat'></a-collada-model>
 

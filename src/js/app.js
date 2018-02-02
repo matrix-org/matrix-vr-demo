@@ -76,6 +76,7 @@ class VRScene extends React.Component {
                 parentElement: document.getElementById('assets'),
                 localVideo: document.getElementById('local'),
                 remoteVideo: document.getElementById('lobbyVideo'),
+                remoteDepthVideo: document.getElementById('lobbyVideoDepth'),
                 peerId: this.props.client.peerId,
             });
         }

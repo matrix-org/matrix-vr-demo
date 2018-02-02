@@ -100,6 +100,7 @@ export default class Assets extends React.Component {
                 {/* Video call assets */}
                 <video id='local' autoPlay muted></video>
                 <video id='lobbyVideo' autoPlay></video>
+                <video id='lobbyVideoDepth' autoPlay></video>
 
                 {/* Tourism scene video playlist */}
                 <span id='tourism'>
