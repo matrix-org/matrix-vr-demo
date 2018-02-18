@@ -141,7 +141,7 @@ export default class VideoView extends React.Component {
                 //                            ((depth_threshold / step_v) * (depth_threshold / step_v));
 
                 // based on looking at the colour of the gradient when scaled between [0.0, 8192.0]
-                float gradient_threshold = 128.0;
+                float gradient_threshold = 96.0;
                 if (gradient > gradient_threshold) {
                     discard;
                 }
