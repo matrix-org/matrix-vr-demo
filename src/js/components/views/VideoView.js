@@ -58,6 +58,8 @@ export default class VideoView extends React.Component {
             }
 
             float d(float L, float Ha, float Hb) {
+                // return 2.5;
+
                 // for now, just consider the L channel and ignore the deltas.
                 return 2.5 * L;
                 //return maxDepth - (maxDepth * L);
@@ -94,9 +96,7 @@ export default class VideoView extends React.Component {
         `;
 
         this.fragmentShader = `
-            #extension GL_OES_standard_derivatives : enable
-
-            const float maxDepth = 1900.0;
+            const float maxDepth = 2500.0;
             const float backDepth = 0.2;
 
             uniform sampler2D depthTex;
@@ -114,16 +114,39 @@ export default class VideoView extends React.Component {
                 // discard if the gradient of the surface is too steep, to avoid
                 // ugly smearing:
                 // stolen from https://stackoverflow.com/questions/43977910/edge-outline-detection-from-texture-in-fragment-shader
-                // N.B. we can do this much better, as per the stackoverflow answer.
 
-                vec4 depthColor = texture2D(depthTex, vUv);
-                float maxColor = depthColor.b;
+                // compute the U & V step needed to read neighbor pixels
+                float step_u = 1.0 / 640.0;
+                float step_v = 1.0 / 480.0;
+
+                vec4 centerPixel = texture2D(depthTex, vUv);
+                vec4 rightPixel  = texture2D(depthTex, vUv + vec2(step_u, 0.0));
+                vec4 bottomPixel = texture2D(depthTex, vUv + vec2(0.0, step_v));
+
+                // FIXME: for this to work properly, we probably need to pass in two textures;
+                // a smoothed one for the depth texture and a nearest neighbour one for calculating the grad.
+                //
+                // texture should not use mipmaps
+                // texture min & mag filtering should be set to GL_NEAREST
+                // texture clamp mode should be set to clamp (not repeat)
+
+                float _dFdx = (rightPixel.b - centerPixel.b) / step_u;
+                float _dFdy = (bottomPixel.b - centerPixel.b) / step_v;
+
                 // consider the variance of the gradient vector; no point wasting time sqrting afterwards.
-                float gradient = 2000.0 * (dFdx(maxColor) * dFdx(maxColor) + dFdy(maxColor) * dFdy(maxColor));
-                if (gradient > 0.5) {
+                float gradient = ((_dFdx * _dFdx) + (_dFdy * _dFdy));
+
+                // float depth_threshold = 0.05;
+                // float gradient_threshold = ((depth_threshold / step_u) * (depth_threshold / step_u)) +
+                //                            ((depth_threshold / step_v) * (depth_threshold / step_v));
+
+                // based on looking at the colour of the gradient when scaled between [0.0, 8192.0]
+                float gradient_threshold = 128.0;
+                if (gradient > gradient_threshold) {
                     discard;
                 }
-                // gl_FragColor = vec4 ( gradient, gradient, gradient, 1.0 );
+
+                //gl_FragColor = vec4 ( gradient, gradient, gradient, 1.0 );
 
                 vec4 videoColor = texture2D(videoTex, vUv);
                 gl_FragColor = vec4( videoColor.rgb, 1 );
