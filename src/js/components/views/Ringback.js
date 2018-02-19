@@ -50,19 +50,19 @@ export default class Ringback extends React.Component {
             items: [
                 {
                     id: 'ringback-welcome',
-                    src: 'https://localhost:9090/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/Welcome_to_Matrix_in_VR.mp4',
                 },
                 {
                     id: 'ringback-you-are-being',
-                    src: 'https://localhost:9090/vrdemo_resources/video/ringback/You_Are_Being.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/You_Are_Being.mp4',
                 },
                 {
                     id: 'ringback-still-waiting',
-                    src: 'https://localhost:9090/vrdemo_resources/video/ringback/Still_Waiting.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/Still_Waiting.mp4',
                 },
                 {
                     id: 'ringback-please-wait',
-                    src: 'https://localhost:9090/vrdemo_resources/video/ringback/Please_Wait.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/ringback/Please_Wait.mp4',
                 },
             ],
         });

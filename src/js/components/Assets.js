@@ -53,17 +53,17 @@ export default class Assets extends React.Component {
                 {/* Models */}
                 <a-asset-item
                     id='lobby'
-                    src='https://localhost:9090/vrdemo_resources/models/holodeck/holodeck.dae'
+                    src='https://matrix.org/vrdemo_resources/models/holodeck/holodeck.dae'
                     preload='auto'
                     crossOrigin></a-asset-item>
                 <a-asset-item
                     id='object-phonebox'
-                    src='https://localhost:9090/vrdemo_resources/models/phonebox/phonebox.dae'
+                    src='https://matrix.org/vrdemo_resources/models/phonebox/phonebox.dae'
                     preload='auto'
                     crossOrigin></a-asset-item>
                 <a-asset-item
                     id='object-skis'
-                    src='https://localhost:9090/vrdemo_resources/models/skis/skis.dae'
+                    src='https://matrix.org/vrdemo_resources/models/skis/skis.dae'
                     preload='auto'
                     crossOrigin></a-asset-item>
 
@@ -72,27 +72,27 @@ export default class Assets extends React.Component {
 
                 {/* Sounds */}
                 <audio id='blip1-sound'
-                    src='https://localhost:9090/vrdemo_resources/audio/blip1.mp3'
+                    src='https://matrix.org/vrdemo_resources/audio/blip1.mp3'
                     preload='auto'
                     crossOrigin>
                 </audio>
                 <audio id='blip2-sound'
-                    src='https://localhost:9090/vrdemo_resources/audio/blip2.mp3'
+                    src='https://matrix.org/vrdemo_resources/audio/blip2.mp3'
                     preload='auto'
                     crossOrigin>
                 </audio>
                 <audio id='stone-in'
-                    src='https://localhost:9090/vrdemo_resources/audio/stone_in.mp3'
+                    src='https://matrix.org/vrdemo_resources/audio/stone_in.mp3'
                     preload='auto'
                     crossOrigin>
                 </audio>
                 <audio id='stone-out'
-                    src='https://localhost:9090/vrdemo_resources/audio/stone_out.mp3'
+                    src='https://matrix.org/vrdemo_resources/audio/stone_out.mp3'
                     preload='auto'
                     crossOrigin>
                 </audio>
                 <audio id='ski-sunday-music'
-                    src='https://localhost:9090/vrdemo_resources/audio/ski_sunday_clip.mp3'
+                    src='https://matrix.org/vrdemo_resources/audio/ski_sunday_clip.mp3'
                     preload='auto' loop
                     crossOrigin>
                 </audio>
@@ -105,7 +105,7 @@ export default class Assets extends React.Component {
                 {/* Tourism scene video playlist */}
                 <span id='tourism'>
                     <video id='ski-video1'
-                        src='https://localhost:9090/vrdemo_resources/video/360/ski1.mp4'
+                        src='https://matrix.org/vrdemo_resources/video/360/ski1.mp4'
                         muted crossOrigin></video>
                     <a-mixin id='ski-video1-mixin' rotation='-5 -90 30' />
                     <a-mixin id='ski-video2-mixin' rotation='-10 -90 15' />

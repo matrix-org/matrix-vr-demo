@@ -51,19 +51,19 @@ export default class TourismScene extends React.Component {
             items: [
                 {
                     id: 'ski-video1',
-                    src: 'https://localhost:9090/vrdemo_resources/video/360/ski1.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/360/ski1.mp4',
                 },
                 {
                     id: 'ski-video2',
-                    src: 'https://localhost:9090/vrdemo_resources/video/360/ski2.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/360/ski2.mp4',
                 },
                 {
                     id: 'ski-video3',
-                    src: 'https://localhost:9090/vrdemo_resources/video/360/ski3.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/360/ski3.mp4',
                 },
                 {
                     id: 'ski-video4',
-                    src: 'https://localhost:9090/vrdemo_resources/video/360/ski4.mp4',
+                    src: 'https://matrix.org/vrdemo_resources/video/360/ski4.mp4',
                 },
             ],
         });
