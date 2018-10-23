@@ -61,7 +61,7 @@ export default class VideoView extends React.Component {
                 // return 2.5;
 
                 // for now, just consider the L channel and ignore the deltas.
-                return 2.5 * L;
+                return 4.5 * L;
                 //return maxDepth - (maxDepth * L);
 
                 //return maxDepth - (maxDepth * (lzero(L) + delta(L, Ha, Hb)));
@@ -256,6 +256,7 @@ export default class VideoView extends React.Component {
             'width': this.props.width,
             'height': this.props.height,
             'scale': '0 0 0',
+            'rotation': '0 0 -90',
             'position': this.props.position.join(' '),
             //'look-at': this.props.faceCamera ? '[camera]' : null,
         };
@@ -284,7 +285,7 @@ export default class VideoView extends React.Component {
                 attribute='scale'
                 dur='1000'
                 from='0 0 0'
-                to='1 1 1'></a-animation>
+                to='1.7777 1 1'></a-animation>
             {text}
         </a-plane>;
 
